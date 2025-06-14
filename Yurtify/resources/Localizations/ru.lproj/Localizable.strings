@@ -1,0 +1,183 @@
+/*
+  Localizable.strings
+  Yurtify
+
+  Created by Dark-Type on 14.06.2025.
+  
+*/
+/* Welcome Screen */
+"welcome.title" = "Добро пожаловать!";
+"welcome.quote" = "Аутентичное жильё\nв самом сердце природы";
+"welcome.register" = "Зарегистрироваться";
+"welcome.login" = "Войти";
+"welcome.or" = "или";
+"welcome.guest" = "Продолжить как гость";
+
+/* Registration Screen */
+"registration.title" = "Регистрация";
+"registration.surname" = "Фамилия";
+"registration.name" = "Имя";
+"registration.patronymic" = "Отчество";
+"registration.phone" = "Номер телефона";
+"registration.email" = "Электронная почта";
+"registration.password" = "Пароль";
+"registration.confirmation" = "Повторный ввод пароля";
+"registration.button" = "Зарегистрироваться";
+
+/* Login Screen */
+"login.title" = "Вход в систему";
+"login.phone" = "Номер телефона";
+"login.password" = "Пароль";
+"login.button" = "Войти";
+
+/* Tabbar */
+"tabbar.list" = "Список";
+"tabbar.map" = "Карта";
+"tabbar.create" = "Создать";
+"tabbar.notifications" = "Уведомления";
+"tabbar.profile" = "Профиль";
+
+/* SearchBar */
+"search" = "Найти адрес";
+
+/* Notifications Screen */
+"notifications.title" = "Уведомления";
+"notifications.today" = "Сегодня";
+"notifications.yesterday" = "Вчера";
+"notifications.client" = "У вас новый клиент";
+"notifications.confirmation" = "Успешно забронировано";
+
+/* Profile Screen */
+"profile.favorite" = "Избранные";
+"profile.rented" = "Сдаваемые";
+"profile.history" = "История";
+
+/* Detail Screen */
+"detail.owner" = "Собственник";
+"detail.conviniences" = "Удобства";
+"detail.adress" = "Адрес";
+"detail.map" = "Посмотреть на карте";
+"detail.price" = "Цена";
+"detail.rent" = "Забронировать";
+"detail.description" = "Описание";
+"detail.galery" = "Галерея";
+"detail.similar" = "Похожие";
+"detail.similar.offers" = "Похожие предложения";
+"detail.sqm" = "кв.м";
+
+/* Detail - Property Complex */
+"detail.complex.membership" = "Коттеджный комплекс";
+"detail.complex.none" = "Нет";
+"detail.complex.name" = "Название комплекса";
+
+/* Detail - Additional Features */
+"detail.features.title" = "Дополнительные условия";
+"detail.features.cafe" = "Кафе";
+"detail.features.restaurants" = "Рестораны";
+"detail.features.gorges" = "Ущелья";
+"detail.features.forests" = "Леса";
+"detail.features.hot_springs" = "Горячие источники";
+
+/* Detail - Distance from Lake */
+"detail.distance.title" = "Удаленность от озера";
+
+/* Detail - Area */
+"detail.area.title" = "Площадь";
+
+/* Detail - Price */
+"detail.price.per_person" = "С человека";
+"detail.price.entire_place" = "За всё жильё";
+
+/* Detail - Property Type */
+"detail.type.title" = "Тип объекта";
+"detail.type.hotel" = "Отель";
+"detail.type.boarding_house" = "Пансионат";
+"detail.type.private_sector" = "Частный сектор";
+"detail.type.guest_house" = "Гостевой дом";
+"detail.type.children_camp" = "Детский лагерь";
+"detail.type.camping" = "Кемпинг";
+"detail.type.recreation_center" = "Центр отдыха";
+
+/* Detail - Rooms */
+"detail.rooms.title" = "Количество комнат";
+
+/* Detail - Capacity */
+"detail.capacity.title" = "Количество мест";
+
+/* Detail - Territory Amenities */
+"detail.territory.title" = "Удобства территории";
+"detail.territory.spa" = "SPA";
+"detail.territory.barbecue" = "Барбекю";
+"detail.territory.basketball" = "Баскетбольная площадка";
+"detail.territory.pool" = "Бассейн";
+"detail.territory.trampoline" = "Батут";
+"detail.territory.billiard" = "Бильярд";
+"detail.territory.playground" = "Детская площадка";
+"detail.territory.private_beach" = "Закрытый пляж";
+"detail.territory.kumys_treatment" = "Кумысолечение";
+"detail.territory.guarded" = "Охраняемая территория";
+"detail.territory.parking" = "Парковка";
+"detail.territory.sauna" = "Сауна";
+"detail.territory.tennis" = "Теннисный корт";
+"detail.territory.gym" = "Тренажерный зал";
+"detail.territory.football" = "Футбольное поле";
+
+/* Detail - Room Amenities */
+"detail.room.title" = "Удобства в номере";
+"detail.room.wifi" = "Wi-Fi";
+"detail.room.balcony" = "Балкон";
+"detail.room.bath_supplies" = "Ванные принадлежности";
+"detail.room.separate_shower" = "Отдельный душ";
+"detail.room.air_conditioning" = "Кондиционер";
+"detail.room.kitchen" = "Кухня";
+"detail.room.microwave" = "Микроволновая печь";
+"detail.room.stove" = "Плита";
+"detail.room.separate_bathroom" = "Отдельный санузел";
+"detail.room.satellite_tv" = "Спутниковое ТВ";
+"detail.room.washing_machine" = "Стиральная машина";
+"detail.room.terrace" = "Терраса";
+"detail.room.cleaning" = "Уборка номера";
+"detail.room.iron" = "Утюг";
+"detail.room.hair_dryer" = "Фен";
+"detail.room.refrigerator" = "Холодильник";
+"detail.room.kettle" = "Электрочайник";
+"detail.room.heating" = "Отопление";
+
+/* Detail - Meals */
+"detail.meals.title" = "Питание";
+"detail.meals.paid_separately" = "За отдельную плату";
+"detail.meals.breakfast_only" = "Только завтрак";
+"detail.meals.three_meals" = "Трёхразовое";
+"detail.meals.no_meals" = "Без питания";
+
+/* Measures - Prices */
+"measures.price.per_day" = "с / день";
+"measures.price.per_week" = "с / неделю";
+"measures.price.per_month" = "с / месяц";
+
+/* Measures - Units */
+"measures.units.sqm" = "кв.м";
+"measures.units.people" = "чел";
+"measures.units.meters" = "м";
+"measures.units.kilometers" = "км";
+
+/* Measures - Plurals (Russian) */
+"measures.plural.bed.one" = "кровать";
+"measures.plural.bed.few" = "кровати";
+"measures.plural.bed.many" = "кроватей";
+
+"measures.plural.room.one" = "комната";
+"measures.plural.room.few" = "комнаты";
+"measures.plural.room.many" = "комнат";
+
+"measures.plural.bathroom.one" = "ванная";
+"measures.plural.bathroom.few" = "ванные";
+"measures.plural.bathroom.many" = "ванных";
+
+"measures.plural.person.one" = "человек";
+"measures.plural.person.few" = "человека";
+"measures.plural.person.many" = "человек";
+
+"measures.plural.place.one" = "место";
+"measures.plural.place.few" = "места";
+"measures.plural.place.many" = "мест";

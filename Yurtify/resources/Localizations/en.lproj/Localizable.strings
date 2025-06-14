@@ -1,0 +1,179 @@
+/*
+  Localizable.strings
+  Yurtify
+
+  Created by Dark-Type on 14.06.2025.
+  
+*/
+/* Welcome Screen */
+"welcome.title" = "Welcome!";
+"welcome.quote" = "Authentic accommodation\nin the heart of nature";
+"welcome.register" = "Sign Up";
+"welcome.login" = "Log In";
+"welcome.or" = "or";
+"welcome.guest" = "Continue as Guest";
+
+/* Registration Screen */
+"registration.title" = "Registration";
+"registration.surname" = "Last Name";
+"registration.name" = "First Name";
+"registration.patronymic" = "Middle Name";
+"registration.phone" = "Phone Number";
+"registration.email" = "Email";
+"registration.password" = "Password";
+"registration.confirmation" = "Confirm Password";
+"registration.button" = "Sign Up";
+
+/* Login Screen */
+"login.title" = "Login";
+"login.phone" = "Phone Number";
+"login.password" = "Password";
+"login.button" = "Log In";
+
+/* Tabbar */
+"tabbar.list" = "List";
+"tabbar.map" = "Map";
+"tabbar.create" = "Create";
+"tabbar.notifications" = "Notifications";
+"tabbar.profile" = "Profile";
+
+/* SearchBar */
+"search" = "Find address";
+
+/* Notifications Screen */
+"notifications.title" = "Notifications";
+"notifications.today" = "Today";
+"notifications.yesterday" = "Yesterday";
+"notifications.client" = "You have a new client";
+"notifications.confirmation" = "Successfully booked";
+
+/* Profile Screen */
+"profile.favorite" = "Favorites";
+"profile.rented" = "Rented";
+"profile.history" = "History";
+
+/* Detail Screen */
+"detail.owner" = "Owner";
+"detail.conviniences" = "Amenities";
+"detail.adress" = "Address";
+"detail.map" = "View on map";
+"detail.price" = "Price";
+"detail.rent" = "Book Now";
+"detail.description" = "Description";
+"detail.galery" = "Gallery";
+"detail.similar" = "Similar";
+"detail.similar.offers" = "Similar offers";
+"detail.sqm" = "sq.m";
+
+/* Detail - Property Complex */
+"detail.complex.membership" = "Cottage Complex";
+"detail.complex.none" = "No";
+"detail.complex.name" = "Complex Name";
+
+/* Detail - Additional Features */
+"detail.features.title" = "Additional Amenities";
+"detail.features.cafe" = "Cafe";
+"detail.features.restaurants" = "Restaurants";
+"detail.features.gorges" = "Gorges";
+"detail.features.forests" = "Forests";
+"detail.features.hot_springs" = "Hot Springs";
+
+/* Detail - Distance from Lake */
+"detail.distance.title" = "Distance from Lake";
+
+/* Detail - Area */
+"detail.area.title" = "Area";
+
+/* Detail - Price */
+"detail.price.per_person" = "Per person";
+"detail.price.entire_place" = "Entire place";
+
+/* Detail - Property Type */
+"detail.type.title" = "Property Type";
+"detail.type.hotel" = "Hotel";
+"detail.type.boarding_house" = "Boarding House";
+"detail.type.private_sector" = "Private Sector";
+"detail.type.guest_house" = "Guest House";
+"detail.type.children_camp" = "Children's Camp";
+"detail.type.camping" = "Camping";
+"detail.type.recreation_center" = "Recreation Center";
+
+/* Detail - Rooms */
+"detail.rooms.title" = "Number of Rooms";
+
+/* Detail - Capacity */
+"detail.capacity.title" = "Capacity";
+
+/* Detail - Territory Amenities */
+"detail.territory.title" = "Territory Amenities";
+"detail.territory.spa" = "SPA";
+"detail.territory.barbecue" = "BBQ";
+"detail.territory.basketball" = "Basketball Court";
+"detail.territory.pool" = "Pool";
+"detail.territory.trampoline" = "Trampoline";
+"detail.territory.billiard" = "Billiard";
+"detail.territory.playground" = "Playground";
+"detail.territory.private_beach" = "Private Beach";
+"detail.territory.kumys_treatment" = "Kumys Treatment";
+"detail.territory.guarded" = "Guarded Territory";
+"detail.territory.parking" = "Parking";
+"detail.territory.sauna" = "Sauna";
+"detail.territory.tennis" = "Tennis Court";
+"detail.territory.gym" = "Gym";
+"detail.territory.football" = "Football Field";
+
+/* Detail - Room Amenities */
+"detail.room.title" = "Room Amenities";
+"detail.room.wifi" = "Wi-Fi";
+"detail.room.balcony" = "Balcony";
+"detail.room.bath_supplies" = "Bath Supplies";
+"detail.room.separate_shower" = "Separate Shower";
+"detail.room.air_conditioning" = "Air Conditioning";
+"detail.room.kitchen" = "Kitchen";
+"detail.room.microwave" = "Microwave";
+"detail.room.stove" = "Stove";
+"detail.room.separate_bathroom" = "Separate Bathroom";
+"detail.room.satellite_tv" = "Satellite TV";
+"detail.room.washing_machine" = "Washing Machine";
+"detail.room.terrace" = "Terrace";
+"detail.room.cleaning" = "Room Cleaning";
+"detail.room.iron" = "Iron";
+"detail.room.hair_dryer" = "Hair Dryer";
+"detail.room.refrigerator" = "Refrigerator";
+"detail.room.kettle" = "Electric Kettle";
+"detail.room.heating" = "Heating";
+
+/* Detail - Meals */
+"detail.meals.title" = "Meals";
+"detail.meals.paid_separately" = "Paid Separately";
+"detail.meals.breakfast_only" = "Breakfast Only";
+"detail.meals.three_meals" = "Three Meals";
+"detail.meals.no_meals" = "No Meals";
+
+/* Measures - Prices */
+
+"measures.price.per_day" = "per day";
+"measures.price.per_week" = "per week";
+"measures.price.per_month" = "per month";
+
+/* Measures - Units */
+"measures.units.sqm" = "sq.m";
+"measures.units.people" = "people";
+"measures.units.meters" = "m";
+"measures.units.kilometers" = "km";
+
+/* Measures - Plurals (English) */
+"measures.plural.bed.one" = "bed";
+"measures.plural.bed.other" = "beds";
+
+"measures.plural.room.one" = "room";
+"measures.plural.room.other" = "rooms";
+
+"measures.plural.bathroom.one" = "bathroom";
+"measures.plural.bathroom.other" = "bathrooms";
+
+"measures.plural.person.one" = "person";
+"measures.plural.person.other" = "people";
+
+"measures.plural.place.one" = "place";
+"measures.plural.place.other" = "places";

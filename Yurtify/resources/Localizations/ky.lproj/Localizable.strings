@@ -1,0 +1,178 @@
+/*
+  Localizable.strings
+  Yurtify
+
+  Created by Dark-Type on 14.06.2025.
+  
+*/
+/* Welcome Screen */
+"welcome.title" = "Кош келдиңиз!";
+"welcome.quote" = "Табияттын жүрөгүндө\nтүпнуска жашоо жайы";
+"welcome.register" = "Катталуу";
+"welcome.login" = "Кирүү";
+"welcome.or" = "же";
+"welcome.guest" = "Конок катары улантуу";
+
+/* Registration Screen */
+"registration.title" = "Катталуу";
+"registration.surname" = "Фамилия";
+"registration.name" = "Аты";
+"registration.patronymic" = "Атасынын аты";
+"registration.phone" = "Телефон номери";
+"registration.email" = "Электрондук почта";
+"registration.password" = "Сыр сөз";
+"registration.confirmation" = "Сыр сөздү кайталоо";
+"registration.button" = "Катталуу";
+
+/* Login Screen */
+"login.title" = "Кирүү";
+"login.phone" = "Телефон номери";
+"login.password" = "Сыр сөз";
+"login.button" = "Кирүү";
+
+/* Tabbar */
+"tabbar.list" = "Тизме";
+"tabbar.map" = "Карта";
+"tabbar.create" = "Түзүү";
+"tabbar.notifications" = "Билдирүүлөр";
+"tabbar.profile" = "Профиль";
+
+/* SearchBar */
+"search" = "Дарек издөө";
+
+/* Notifications Screen */
+"notifications.title" = "Билдирүүлөр";
+"notifications.today" = "Бүгүн";
+"notifications.yesterday" = "Кече";
+"notifications.client" = "Сизде жаңы кардар бар";
+"notifications.confirmation" = "Ийгиликтүү брондолду";
+
+/* Profile Screen */
+"profile.favorite" = "Сүйүктүүлөр";
+"profile.rented" = "Ижарага берилгендер";
+"profile.history" = "Тарых";
+
+/* Detail Screen */
+"detail.owner" = "Ээси";
+"detail.conviniences" = "Ыңгайлуулуктар";
+"detail.adress" = "Дарек";
+"detail.map" = "Картада көрүү";
+"detail.price" = "Баасы";
+"detail.rent" = "Брондоо";
+"detail.description" = "Сүрөттөмө";
+"detail.galery" = "Галерея";
+"detail.similar" = "Окшош";
+"detail.similar.offers" = "Окшош сунуштар";
+"detail.sqm" = "кв.м";
+
+/* Detail - Property Complex */
+"detail.complex.membership" = "Коттедж комплекси";
+"detail.complex.none" = "Жок";
+"detail.complex.name" = "Комплекстин аталышы";
+
+/* Detail - Additional Features */
+"detail.features.title" = "Кошумча шарттар";
+"detail.features.cafe" = "Кафе";
+"detail.features.restaurants" = "Ресторандар";
+"detail.features.gorges" = "Капчыгайлар";
+"detail.features.forests" = "Токойлор";
+"detail.features.hot_springs" = "Ысык булактар";
+
+/* Detail - Distance from Lake */
+"detail.distance.title" = "Көлдөн алыстык";
+
+/* Detail - Area */
+"detail.area.title" = "Аянты";
+
+/* Detail - Price */
+"detail.price.per_person" = "Адамдан";
+"detail.price.entire_place" = "Бүт жайдан";
+
+/* Detail - Property Type */
+"detail.type.title" = "Мүлктүн түрү";
+"detail.type.hotel" = "Мейманкана";
+"detail.type.boarding_house" = "Пансионат";
+"detail.type.private_sector" = "Жеке сектор";
+"detail.type.guest_house" = "Конок үйү";
+"detail.type.children_camp" = "Балдар лагери";
+"detail.type.camping" = "Кемпинг";
+"detail.type.recreation_center" = "Эс алуу борбору";
+
+/* Detail - Rooms */
+"detail.rooms.title" = "Бөлмөлөрдүн саны";
+
+/* Detail - Capacity */
+"detail.capacity.title" = "Сыйымдуулугу";
+
+/* Detail - Territory Amenities */
+"detail.territory.title" = "Аймактын ыңгайлуулуктары";
+"detail.territory.spa" = "СПА";
+"detail.territory.barbecue" = "Барбекю";
+"detail.territory.basketball" = "Баскетбол талаасы";
+"detail.territory.pool" = "Бассейн";
+"detail.territory.trampoline" = "Батут";
+"detail.territory.billiard" = "Бильярд";
+"detail.territory.playground" = "Балдар аянтчасы";
+"detail.territory.private_beach" = "Жеке пляж";
+"detail.territory.kumys_treatment" = "Кымыз менен дарылоо";
+"detail.territory.guarded" = "Корголгон аймак";
+"detail.territory.parking" = "Автотоктотмо";
+"detail.territory.sauna" = "Мончо";
+"detail.territory.tennis" = "Теннис корту";
+"detail.territory.gym" = "Спорт залы";
+"detail.territory.football" = "Футбол талаасы";
+
+/* Detail - Room Amenities */
+"detail.room.title" = "Бөлмөнүн ыңгайлуулуктары";
+"detail.room.wifi" = "Wi-Fi";
+"detail.room.balcony" = "Балкон";
+"detail.room.bath_supplies" = "Ванна буюмдары";
+"detail.room.separate_shower" = "Өзүнчө душ";
+"detail.room.air_conditioning" = "Кондиционер";
+"detail.room.kitchen" = "Ашкана";
+"detail.room.microwave" = "Микроволновка";
+"detail.room.stove" = "Плита";
+"detail.room.separate_bathroom" = "Өзүнчө ванна";
+"detail.room.satellite_tv" = "Спутниктик ТВ";
+"detail.room.washing_machine" = "Кир жуугуч машина";
+"detail.room.terrace" = "Терраса";
+"detail.room.cleaning" = "Бөлмө тазалоо";
+"detail.room.iron" = "Үтүк";
+"detail.room.hair_dryer" = "Чач кургатуучу";
+"detail.room.refrigerator" = "Муздаткыч";
+"detail.room.kettle" = "Электр чайник";
+"detail.room.heating" = "Жылытуу";
+
+/* Detail - Meals */
+"detail.meals.title" = "Тамактануу";
+"detail.meals.paid_separately" = "Өзүнчө төлөө менен";
+"detail.meals.breakfast_only" = "Эртең мененки гана";
+"detail.meals.three_meals" = "Үч жолу тамактануу";
+"detail.meals.no_meals" = "Тамактануусуз";
+
+/* Measures - Price */
+"measures.price.per_day" = "с /күнү";
+"measures.price.per_week" = "c / жумасына";
+"measures.price.per_month" = "c / айына";
+
+/* Measures - Units */
+"measures.units.sqm" = "кв.м";
+"measures.units.people" = "адам";
+"measures.units.meters" = "м";
+"measures.units.kilometers" = "км";
+
+/* Measures - Plurals (Kyrgyz) */
+"measures.plural.bed.one" = "төшөк";
+"measures.plural.bed.other" = "төшөк";
+
+"measures.plural.room.one" = "бөлмө";
+"measures.plural.room.other" = "бөлмө";
+
+"measures.plural.bathroom.one" = "ванна";
+"measures.plural.bathroom.other" = "ванна";
+
+"measures.plural.person.one" = "адам";
+"measures.plural.person.other" = "адам";
+
+"measures.plural.place.one" = "орун";
+"measures.plural.place.other" = "орун";
