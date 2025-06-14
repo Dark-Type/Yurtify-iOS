@@ -4,6 +4,7 @@
 //
 //  Created by dark type on 15.06.2025.
 //
+import Foundation
 
 enum TabBarConstants {
     static let topPadding: CGFloat = 15

@@ -23,17 +23,20 @@
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="LogoWithText" translatesAutoresizingMaskIntoConstraints="NO" id="q4s-BF-YvN">
-                                <rect key="frame" x="8" y="76" width="377" height="655"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LogoWithText" translatesAutoresizingMaskIntoConstraints="NO" id="q4s-BF-YvN">
+                                <rect key="frame" x="8" y="104" width="377" height="575"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" name="Base"/>
                         <constraints>
                             <constraint firstItem="Bcu-3y-fUS" firstAttribute="centerX" secondItem="obG-Y5-kRd" secondAttribute="centerX" id="5cz-MP-9tL"/>
+                            <constraint firstItem="q4s-BF-YvN" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" constant="104" id="83K-vQ-4hq"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="q4s-BF-YvN" secondAttribute="bottom" constant="105" id="8W5-uV-Nov"/>
+                            <constraint firstItem="q4s-BF-YvN" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="8" id="FTc-aF-GMC"/>
                             <constraint firstItem="obG-Y5-kRd" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="20" symbolic="YES" id="SfN-ll-jLj"/>
                             <constraint firstAttribute="bottom" secondItem="obG-Y5-kRd" secondAttribute="bottom" constant="20" id="Y44-ml-fuU"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="q4s-BF-YvN" secondAttribute="trailing" constant="8" id="Zue-EZ-l19"/>
                         </constraints>
                     </view>
                 </viewController>
