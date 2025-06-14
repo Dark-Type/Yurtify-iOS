@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     @EnvironmentObject var authManager: AuthManager
-    @EnvironmentObject var authCoordinator: AuthPresentationManager
+    @EnvironmentObject var appRouter: AppRouter
     
     var body: some View {
         VStack(spacing: 30) {
@@ -23,9 +23,7 @@ struct WelcomeView: View {
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 40)
-        .background(
-            .base
-        )
+        .background(.base)
     }
     
     private var welcomeContent: some View {
@@ -37,7 +35,7 @@ struct WelcomeView: View {
             
             Text(L10n.Welcome.title)
                 .font(.app.largeTitle(.bold))
-                .foregroundColor(.app.textPrimary)
+                .foregroundColor(.textPrimary)
             
             Text(L10n.Welcome.quote)
                 .font(.app.body(.regular))
@@ -50,11 +48,11 @@ struct WelcomeView: View {
     private var actionButtons: some View {
         VStack(spacing: 16) {
             Button(action: {
-                authCoordinator.showRegistration()
+                appRouter.navigateToRegister()
             }) {
                 Text(L10n.Welcome.register)
                     .font(.app.headline(.semiBold))
-                    .foregroundColor(.textPrimary)
+                    .foregroundColor(.base)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(.secondaryVariant)
@@ -62,7 +60,7 @@ struct WelcomeView: View {
             }
             
             Button(action: {
-                authCoordinator.showLogin()
+                appRouter.navigateToLogin()
             }) {
                 Text(L10n.Welcome.login)
                     .font(.app.headline(.semiBold))
@@ -93,6 +91,7 @@ struct WelcomeView: View {
             
             Button(action: {
                 authManager.continueAsGuest()
+                appRouter.navigateToMain()
             }) {
                 Text(L10n.Welcome.guest)
                     .font(.app.callout(.medium))
