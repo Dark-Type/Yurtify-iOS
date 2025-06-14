@@ -2,6 +2,8 @@ import SwiftUI
 
 enum AppIcons: String, CaseIterable {
     // MARK: - Property Icons
+    case addSelected = "AddSelected"
+    case addUnselected = "AddUnselected"
     case bath = "Bath"
     case bathBig = "BathBig"
     case bed = "Bed"
@@ -41,6 +43,7 @@ enum AppIcons: String, CaseIterable {
     case star = "Star"
     case washingMachine = "WashingMachine"
     case wifi = "Wifi"
+    
     
     // MARK: - Computed Properties for Organization
     var image: Image {
@@ -93,6 +96,11 @@ extension AppIcons {
             return isSelected ? .favoriteButtonSelected : .favoriteButtonUnselected
         case .favoriteButtonSelected:
             return isSelected ? .favoriteButtonSelected : .favoriteButtonUnselected
+        case .addSelected:
+            return isSelected ? .addSelected : .addUnselected
+        case .addUnselected:
+            return isSelected ? .addSelected : .addUnselected
+            
         default:
             return self
         }
@@ -108,6 +116,8 @@ extension AppIcons {
         case .profileSelected: return .profileUnselected
         case .favoriteButtonUnselected: return .favoriteButtonSelected
         case .favoriteButtonSelected: return .favoriteButtonUnselected
+        case .addSelected: return .addUnselected
+        case .addUnselected: return .addSelected
         default: return self
         }
     }

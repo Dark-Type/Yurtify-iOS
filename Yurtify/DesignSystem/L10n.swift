@@ -228,7 +228,7 @@ enum L10n {
         }
     }
     
-    // MARK: - Unified Measures System (Updated for 3 languages)
+    // MARK: - Unified Measures System
 
     enum Measures {
         // MARK: - Time Periods
@@ -256,7 +256,7 @@ enum L10n {
             }
         }
         
-        // MARK: - Countable Items (with language-aware pluralization)
+        // MARK: - Countable Items
 
         enum CountableItem: String, CaseIterable {
             case bed = "measures.plural.bed"
@@ -375,7 +375,7 @@ enum L10n {
     }
 }
 
-// MARK: - Russian Pluralization Rules (unchanged)
+// MARK: - Russian Pluralization Rules
 
 enum RussianPluralization {
     enum PluralForm: String {
