@@ -29,7 +29,7 @@
 "login.phone" = "Телефон номери";
 "login.password" = "Сыр сөз";
 "login.button" = "Кирүү";
-
+"login.no_account" = "Аккаунт жокпу?";
 /* Tabbar */
 "tabbar.list" = "Тизме";
 "tabbar.map" = "Карта";

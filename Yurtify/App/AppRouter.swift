@@ -19,12 +19,20 @@ class AppRouter: ObservableObject {
     @Published var currentRoute: AppRoute = .welcome
     
     private var authManager: AuthManager?
+    private var isReady = false
     
     // MARK: - Setup
     
     func setAuthManager(_ authManager: AuthManager) {
         self.authManager = authManager
-        determineInitialRoute()
+        
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            await MainActor.run {
+                determineInitialRoute()
+                isReady = true
+            }
+        }
     }
     
     // MARK: - Navigation
@@ -45,32 +53,40 @@ class AppRouter: ObservableObject {
         currentRoute = .main
     }
     
-    // MARK: - Auth Flow Actions (Simplified)
+    // MARK: - Auth Flow Actions
     
     func handleLogout() {
         authManager?.logout()
+        
         currentRoute = .welcome
+        
+        Task {
+            try? await Task.sleep(nanoseconds: 200_000_000)
+            await MainActor.run {
+                print("✅ Logout navigation complete")
+            }
+        }
     }
     
     // MARK: - Route Determination
     
     private func determineInitialRoute() {
-        guard let authManager = authManager else { return }
-        
-        if authManager.isAuthenticated {
-            currentRoute = .main
-        } else {
-            currentRoute = .welcome
+        guard let authManager = authManager else {
+            return
         }
+        
+        currentRoute = authManager.isAuthenticated ? .main : .welcome
     }
     
-    func handleAuthStateChange() {
-        guard let authManager = authManager else { return }
+    func handleAuthStateChange(newAuthState: Bool) {
+        guard let authManager = authManager, isReady else {
+            return
+        }
         
-        if authManager.isAuthenticated {
+        if newAuthState {
             currentRoute = .main
         } else {
-            if currentRoute != .main {
+            if currentRoute == .main {
                 currentRoute = .welcome
             }
         }

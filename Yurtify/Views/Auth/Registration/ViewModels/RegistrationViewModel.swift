@@ -33,7 +33,7 @@ class RegistrationViewModel: ObservableObject {
             password == confirmation
     }
     
-    // MARK: - Actions (Dependencies injected via method parameters)
+    // MARK: - Actions
     
     func register(authManager: AuthManager) {
         guard isFormValid else { return }
@@ -53,6 +53,10 @@ class RegistrationViewModel: ObservableObject {
                 )
                 
                 try await authManager.register(data: registrationData)
+                
+                await MainActor.run {
+                    isLoading = false
+                }
                 
             } catch {
                 await MainActor.run {

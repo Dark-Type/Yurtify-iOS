@@ -13,24 +13,47 @@ struct RootNavigationView: View {
 
     var body: some View {
         Group {
-            switch appRouter.currentRoute {
-            case .welcome:
-                WelcomeView()
-            case .login:
-                LoginView()
-            case .register:
-                RegistrationView()
-            case .main:
-                MainTabView()
+            if authManager.isInitializing {
+                VStack {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                    Text("Loading...")
+                        .font(.app.body(.medium))
+                        .foregroundColor(.textPrimary)
+                        .padding(.top)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.base)
+            } else {
+                switch appRouter.currentRoute {
+                case .welcome:
+                    WelcomeView()
+                case .login:
+                    LoginView()
+                case .register:
+                    RegistrationView()
+                case .main:
+                    MainTabView()
+                }
             }
         }
         .environmentObject(appRouter)
         .environmentObject(authManager)
-        .onReceive(authManager.$isAuthenticated) { _ in
-            appRouter.handleAuthStateChange()
+        .onReceive(authManager.$isAuthenticated) { isAuthenticated in
+
+            if !authManager.isInitializing {
+                appRouter.handleAuthStateChange(newAuthState: isAuthenticated)
+            }
         }
         .onAppear {
-            appRouter.setAuthManager(authManager)
+            if !authManager.isInitializing {
+                appRouter.setAuthManager(authManager)
+            }
+        }
+        .onChange(of: authManager.isInitializing) { isInitializing in
+            if !isInitializing {
+                appRouter.setAuthManager(authManager)
+            }
         }
     }
 }

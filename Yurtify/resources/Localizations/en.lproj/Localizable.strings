@@ -29,6 +29,7 @@
 "login.phone" = "Phone Number";
 "login.password" = "Password";
 "login.button" = "Log In";
+"login.no_account" = "Don't have an account?";
 
 /* Tabbar */
 "tabbar.list" = "List";

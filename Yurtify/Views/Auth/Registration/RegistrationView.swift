@@ -34,7 +34,7 @@ struct RegistrationView: View {
                 .background(.base)
                 .navigationTitle(L10n.Registration.title)
                 .navigationBarTitleDisplayMode(.large)
-                .navigationTitleColor(.textPrimary) 
+                .navigationTitleColor(.textPrimary)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: { viewModel.navigateToWelcome(appRouter: appRouter) }) {

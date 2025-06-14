@@ -30,7 +30,7 @@
 "login.phone" = "Номер телефона";
 "login.password" = "Пароль";
 "login.button" = "Войти";
-
+"login.no_account" = "Нет аккаунта?";
 /* Tabbar */
 "tabbar.list" = "Список";
 "tabbar.map" = "Карта";

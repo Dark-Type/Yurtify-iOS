@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RegistrationContentView: View {
     @ObservedObject var viewModel: RegistrationViewModel
-    let authManager: AuthManager 
+    let authManager: AuthManager
     let geometry: GeometryProxy
     
     var body: some View {
@@ -85,17 +85,18 @@ struct RegistrationContentView: View {
                     Text(L10n.Registration.button)
                 }
             }
+            .font(.app.headline(.semiBold))
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, RegistrationMetrics.buttonPadding(for: geometry))
+            .background(viewModel.isFormValid ? .primaryVariant : .gray)
+            .cornerRadius(12)
+            .contentShape(Rectangle()) 
         }
-        .font(.app.headline(.semiBold))
-        .foregroundColor(.white)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, RegistrationMetrics.buttonPadding(for: geometry))
-        .background(viewModel.isFormValid ? .primaryVariant : .gray)
-        .cornerRadius(12)
         .disabled(!viewModel.isFormValid || viewModel.isLoading)
         .animation(.easeInOut(duration: 0.2), value: viewModel.isFormValid)
     }
-       
+
     @ViewBuilder
     private var errorSection: some View {
         if let errorMessage = viewModel.errorMessage {

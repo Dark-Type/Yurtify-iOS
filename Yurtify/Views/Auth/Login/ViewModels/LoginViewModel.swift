@@ -25,6 +25,7 @@ class LoginViewModel: ObservableObject {
     
     func login(authManager: AuthManager) {
         guard isFormValid else { return }
+        guard !isLoading else { return }
         
         isLoading = true
         errorMessage = nil
@@ -36,6 +37,13 @@ class LoginViewModel: ObservableObject {
                     password: password
                 )
                 
+                await MainActor.run {
+                    isLoading = false
+                    Task {
+                        try? await Task.sleep(nanoseconds: 100_000_000)
+                    }
+                }
+                
             } catch {
                 await MainActor.run {
                     isLoading = false
@@ -43,6 +51,13 @@ class LoginViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    func resetState() {
+        phoneNumber = ""
+        password = ""
+        isLoading = false
+        errorMessage = nil
     }
     
     func navigateToRegister(appRouter: AppRouter) {

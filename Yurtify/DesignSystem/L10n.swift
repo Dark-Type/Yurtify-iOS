@@ -59,6 +59,7 @@ enum L10n {
         static let phone = NSLocalizedString("login.phone", comment: "")
         static let password = NSLocalizedString("login.password", comment: "")
         static let button = NSLocalizedString("login.button", comment: "")
+        static let noAccount = NSLocalizedString("login.no_account", comment: "")
     }
     
     // MARK: - TabBar

@@ -13,6 +13,7 @@ final class AuthManager: ObservableObject {
     @Published var isAuthenticated = false
     @Published var currentUser: User?
     @Published var isLoading = false
+    @Published var isInitializing = true
     
     private let userDefaultsService = UserDefaultsService()
     private let keychainService = KeychainService()
@@ -20,41 +21,53 @@ final class AuthManager: ObservableObject {
     private let tokenManager = TokenManager(keychainService: KeychainService())
     
     private var cancellables = Set<AnyCancellable>()
+    private var tokenValidationTask: Task<Void, Never>?
     
     init() {
-        checkAuthenticationStatus()
-        startTokenMonitoring()
+        Task {
+            await initializeAuth()
+        }
     }
     
     // MARK: - Initial Setup
     
-    func checkAuthenticationStatus() {
-        if userDefaultsService.shouldBeAuthenticated {
-            if let userData = keychainService.getUserData() {
+    private func initializeAuth() async {
+        let shouldBeAuthenticated = userDefaultsService.shouldBeAuthenticated
+        let userData = keychainService.getUserData()
+        
+        await MainActor.run {
+            if shouldBeAuthenticated, let userData = userData {
                 currentUser = userData
                 isAuthenticated = true
                 
                 Task {
-                    do {
-                        let updatedUser = try await tokenManager.validateTokens(for: userData)
-                        await MainActor.run {
-                            if updatedUser != userData {
-                                currentUser = updatedUser
-                            }
-                        }
-                    } catch {
-                        print("Token validation failed during startup: \(error)")
-                        await MainActor.run {
-                            logout()
-                        }
-                    }
+                    await validateInitialTokens(for: userData)
                 }
             } else {
-                userDefaultsService.setShouldBeAuthenticated(false)
+                if shouldBeAuthenticated {
+                    userDefaultsService.setShouldBeAuthenticated(false)
+                }
                 isAuthenticated = false
             }
-        } else {
-            isAuthenticated = false
+            
+            isInitializing = false
+            
+            startTokenMonitoring()
+        }
+    }
+    
+    private func validateInitialTokens(for userData: User) async {
+        do {
+            let updatedUser = try await tokenManager.validateTokens(for: userData)
+            await MainActor.run {
+                if updatedUser != userData {
+                    currentUser = updatedUser
+                }
+            }
+        } catch {
+            await MainActor.run {
+                logout()
+            }
         }
     }
     
@@ -72,8 +85,14 @@ final class AuthManager: ObservableObject {
     // MARK: - Authentication Actions
     
     func login(phoneNumber: String, password: String) async throws {
+        guard !isLoading else {
+            throw AuthError.loginInProgress
+        }
+        
+        tokenValidationTask?.cancel()
+        tokenValidationTask = nil
+        
         isLoading = true
-        defer { isLoading = false }
         
         do {
             let loginResponse = try await authAPIService.login(
@@ -83,71 +102,101 @@ final class AuthManager: ObservableObject {
             
             let user = User(from: loginResponse, password: password)
             
-            do {
-                try keychainService.storeUser(user)
-                userDefaultsService.setShouldBeAuthenticated(true)
-                
+            try keychainService.storeUser(user)
+            userDefaultsService.setShouldBeAuthenticated(true)
+            
+            await MainActor.run {
                 currentUser = user
                 isAuthenticated = true
-            } catch {
-                throw AuthError.storageError
+                isLoading = false
+                
+                objectWillChange.send()
             }
             
         } catch {
+            await MainActor.run {
+                isLoading = false
+            }
             throw error
         }
     }
     
     func register(data: RegistrationData) async throws {
         isLoading = true
-        defer { isLoading = false }
         
         do {
             let registerResponse = try await authAPIService.register(data: data)
             
             let user = User(from: registerResponse, password: data.password)
             
-            do {
-                try keychainService.storeUser(user)
-                userDefaultsService.setShouldBeAuthenticated(true)
-                
+            try keychainService.storeUser(user)
+            userDefaultsService.setShouldBeAuthenticated(true)
+            
+            await MainActor.run {
                 currentUser = user
                 isAuthenticated = true
-            } catch {
-                throw AuthError.storageError
+                isLoading = false
             }
             
         } catch {
+            await MainActor.run {
+                isLoading = false
+            }
             throw error
         }
     }
     
     func logout() {
+        print("🔄 Starting logout process")
+           
+        tokenValidationTask?.cancel()
+        tokenValidationTask = nil
+           
+        cancellables.removeAll()
+           
         keychainService.clearUserData()
         userDefaultsService.setShouldBeAuthenticated(false)
-        
+           
         currentUser = nil
         isAuthenticated = false
+        isLoading = false
+           
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            await MainActor.run {
+                startTokenMonitoring()
+            }
+        }
     }
     
     // MARK: - Token Management
     
     private func validateCurrentTokens() async {
-        guard let user = currentUser else { return }
-        
-        do {
-            let updatedUser = try await tokenManager.validateTokens(for: user)
-            await MainActor.run {
-                if updatedUser != user {
-                    currentUser = updatedUser
+        guard let user = currentUser, isAuthenticated else { return }
+           
+        tokenValidationTask = Task {
+            do {
+                let updatedUser = try await tokenManager.validateTokens(for: user)
+                   
+                if Task.isCancelled { return }
+                   
+                await MainActor.run {
+                    if isAuthenticated && currentUser?.id == user.id && updatedUser != user {
+                        currentUser = updatedUser
+                    }
+                }
+            } catch {
+                if Task.isCancelled { return }
+                   
+                await MainActor.run {
+                    if isAuthenticated && currentUser?.id == user.id {
+                        logout()
+                    }
                 }
             }
-        } catch {
-            print("Token validation failed: \(error)")
-            await MainActor.run {
-                logout()
-            }
         }
+           
+        await tokenValidationTask?.value
     }
 }
 
@@ -160,7 +209,6 @@ extension AuthManager {
         
         currentUser = nil
         isAuthenticated = false
-        
-        print("✅ Continuing as guest - no authentication required")
+        isLoading = false
     }
 }

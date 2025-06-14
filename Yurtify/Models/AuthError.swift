@@ -16,6 +16,7 @@ enum AuthError: Error, LocalizedError {
     case refreshTokenExpired
     case networkError
     case storageError
+    case loginInProgress
 
     var errorDescription: String? {
         switch self {
@@ -35,6 +36,8 @@ enum AuthError: Error, LocalizedError {
             return "Network error. Please check your connection"
         case .storageError:
             return "Failed to save user data. Please try again"
+        case .loginInProgress:
+            return "Login already in progress"
         }
     }
 }

@@ -15,9 +15,7 @@ struct YurtifyApp: App {
         WindowGroup {
             RootNavigationView()
                 .environmentObject(authManager)
-                .onAppear {
-                    authManager.checkAuthenticationStatus()
-                }
+                .onAppear {}
         }
     }
 }
