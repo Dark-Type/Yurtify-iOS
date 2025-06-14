@@ -15,15 +15,15 @@
 
 /* Registration Screen */
 "registration.title" = "Регистрация";
-"registration.surname" = "Фамилия";
-"registration.name" = "Имя";
+"registration.surname" = "Фамилия*";
+"registration.name" = "Имя*";
 "registration.patronymic" = "Отчество";
-"registration.phone" = "Номер телефона";
+"registration.phone" = "Номер телефона*";
 "registration.email" = "Электронная почта";
-"registration.password" = "Пароль";
-"registration.confirmation" = "Повторный ввод пароля";
+"registration.password" = "Пароль*";
+"registration.confirmation" = "Повторный ввод пароля*";
 "registration.button" = "Зарегистрироваться";
-"registration.already_have_account" = "Уже есть аккаунт?";
+"registration.already.have.account" = "Уже есть аккаунт?";
 
 /* Login Screen */
 "login.title" = "Вход в систему";

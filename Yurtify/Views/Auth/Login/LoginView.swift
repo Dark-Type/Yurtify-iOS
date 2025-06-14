@@ -87,7 +87,6 @@ struct LoginView: View {
             .disabled(!viewModel.isFormValid || viewModel.isLoading)
             .animation(.easeInOut(duration: 0.2), value: viewModel.isFormValid)
             
-            // Error message
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
                     .font(.app.caption1(.medium))

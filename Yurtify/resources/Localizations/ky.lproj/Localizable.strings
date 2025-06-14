@@ -15,13 +15,13 @@
 
 /* Registration Screen */
 "registration.title" = "Катталуу";
-"registration.surname" = "Фамилия";
-"registration.name" = "Аты";
+"registration.surname" = "Фамилия*";
+"registration.name" = "Аты*";
 "registration.patronymic" = "Атасынын аты";
-"registration.phone" = "Телефон номери";
+"registration.phone" = "Телефон номери*";
 "registration.email" = "Электрондук почта";
-"registration.password" = "Сыр сөз";
-"registration.confirmation" = "Сыр сөздү кайталоо";
+"registration.password" = "Сыр сөз*";
+"registration.confirmation" = "Сыр сөздү кайталоо*";
 "registration.button" = "Катталуу";
 "registration.already_have_account" = "Аккаунтуңуз барбы?";
 /* Login Screen */

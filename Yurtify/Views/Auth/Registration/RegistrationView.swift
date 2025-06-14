@@ -20,12 +20,12 @@ struct RegistrationView: View {
                         RegistrationContentView(
                             viewModel: viewModel,
                             authManager: authManager,
-
                             geometry: geometry
                         )
 
                         RegistrationFooterView(
-                            viewModel: viewModel, appRouter: appRouter
+                            viewModel: viewModel,
+                            appRouter: appRouter
                         )
                     }
                     .padding(.horizontal, RegistrationMetrics.horizontalPadding(for: geometry))
@@ -33,9 +33,8 @@ struct RegistrationView: View {
                 }
                 .background(.base)
                 .navigationTitle(L10n.Registration.title)
-                .foregroundStyle(.textPrimary)
-                .font(.app.interExtraBold(size: RegistrationMetrics.titleSize(for: geometry)))
                 .navigationBarTitleDisplayMode(.large)
+                .navigationTitleColor(.textPrimary) 
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: { viewModel.navigateToWelcome(appRouter: appRouter) }) {

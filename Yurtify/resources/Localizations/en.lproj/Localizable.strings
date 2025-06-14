@@ -15,13 +15,13 @@
 
 /* Registration Screen */
 "registration.title" = "Registration";
-"registration.surname" = "Last Name";
-"registration.name" = "First Name";
+"registration.surname" = "Last Name*";
+"registration.name" = "First Name*";
 "registration.patronymic" = "Middle Name";
-"registration.phone" = "Phone Number";
+"registration.phone" = "Phone Number*";
 "registration.email" = "Email";
-"registration.password" = "Password";
-"registration.confirmation" = "Confirm Password";
+"registration.password" = "Password*";
+"registration.confirmation" = "Confirm Password*";
 "registration.button" = "Sign Up";
 "registration.already_have_account" = "Already have an account?";
 /* Login Screen */
