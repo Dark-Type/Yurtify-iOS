@@ -23,7 +23,7 @@
 "registration.password" = "Сыр сөз";
 "registration.confirmation" = "Сыр сөздү кайталоо";
 "registration.button" = "Катталуу";
-
+"registration.already_have_account" = "Аккаунтуңуз барбы?";
 /* Login Screen */
 "login.title" = "Кирүү";
 "login.phone" = "Телефон номери";

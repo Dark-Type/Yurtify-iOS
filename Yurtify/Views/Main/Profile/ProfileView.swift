@@ -10,17 +10,33 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var appRouter: AppRouter
+    @StateObject private var viewModel = ProfileViewModel()
     
     var body: some View {
         NavigationStack {
             Group {
-                if authManager.isLoggedIn {
+                if authManager.isAuthenticated {
                     userProfileContent
                 } else {
-                    SuggestAccountView()
+                    SuggestAccountView(
+                    )
                 }
             }
             .navigationTitle(L10n.TabBar.profile)
+        }
+        .confirmationDialog(
+            "L10n.Profile.logoutConfirmationTitle",
+            isPresented: $viewModel.showingLogoutConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("L10n.Profile.logoutConfirm", role: .destructive) {
+                viewModel.logout(authManager: authManager, appRouter: appRouter)
+            }
+            Button("L10n.Profile.cancel", role: .cancel) {
+                viewModel.cancelLogout()
+            }
+        } message: {
+            Text("L10n.Profile.logoutConfirmationMessage")
         }
     }
     
@@ -28,9 +44,7 @@ struct ProfileView: View {
         ScrollView {
             VStack(spacing: 24) {
                 userInfoSection
-                
                 accountActionsSection
-                
                 appSettingsSection
             }
             .padding()
@@ -42,16 +56,16 @@ struct ProfileView: View {
             if let user = authManager.currentUser {
                 VStack(spacing: 12) {
                     Circle()
-                        .fill(.textPrimary)
+                        .fill(.primaryVariant)
                         .frame(width: 100, height: 100)
                         .overlay(
-                            Text("\(user.name.first?.uppercased() ?? "")\(user.surname.first?.uppercased() ?? "")")
-                                .font(.body)
-                                .foregroundColor(.textPrimary)
+                            Text(viewModel.getUserInitials(user: user))
+                                .font(.app.title2(.bold))
+                                .foregroundColor(.white)
                         )
                     
                     VStack(spacing: 4) {
-                        Text("\(user.name) \(user.surname)")
+                        Text(viewModel.getFullName(user: user))
                             .font(.app.title2(.semiBold))
                             .foregroundColor(.app.textPrimary)
                         
@@ -81,34 +95,26 @@ struct ProfileView: View {
     
     private var accountActionsSection: some View {
         VStack(spacing: 0) {
-            profileActionRow(
+            ProfileActionRow(
                 icon: "person.circle",
-                title: "Edit Profile",
-                action: {
-                    // TODO: Navigate to edit profile
-                }
+                title: "L10n.Profile.editProfile",
+                action: viewModel.editProfile
             )
             
-            Divider()
-                .padding(.leading, 44)
+            ProfileDivider()
             
-            profileActionRow(
+            ProfileActionRow(
                 icon: "key",
-                title: "Change Password",
-                action: {
-                    // TODO: Navigate to change password
-                }
+                title: "L10n.Profile.changePassword",
+                action: viewModel.changePassword
             )
             
-            Divider()
-                .padding(.leading, 44)
+            ProfileDivider()
             
-            profileActionRow(
+            ProfileActionRow(
                 icon: "heart",
-                title: "My Favorites",
-                action: {
-                    // TODO: Navigate to favorites
-                }
+                title: L10n.Profile.favorite,
+                action: viewModel.showFavorites
             )
         }
         .background(.base)
@@ -117,86 +123,39 @@ struct ProfileView: View {
     
     private var appSettingsSection: some View {
         VStack(spacing: 0) {
-            profileActionRow(
+            ProfileActionRow(
                 icon: "bell",
-                title: "Notifications",
-                action: {
-                    // TODO: Navigate to notification settings
-                }
+                title: "L10n.Profile.notifications",
+                action: viewModel.showNotificationSettings
             )
             
-            Divider()
-                .padding(.leading, 44)
+            ProfileDivider()
             
-            profileActionRow(
+            ProfileActionRow(
                 icon: "questionmark.circle",
-                title: "Help & Support",
-                action: {
-                    // TODO: Navigate to help
-                }
+                title: "L10n.Profile.help",
+                action: viewModel.showHelp
             )
             
-            Divider()
-                .padding(.leading, 44)
+            ProfileDivider()
             
-            profileActionRow(
+            ProfileActionRow(
                 icon: "info.circle",
-                title: "About",
-                action: {
-                    // TODO: Navigate to about
-                }
+                title: "L10n.Profile.about",
+                action: viewModel.showAbout
             )
             
-            Divider()
-                .padding(.leading, 44)
+            ProfileDivider()
             
-            profileActionRow(
+            ProfileActionRow(
                 icon: "rectangle.portrait.and.arrow.right",
-                title: "Sign Out",
+                title: "L10n.Profile.signOut",
                 titleColor: .red,
-                action: {
-                    appRouter.handleLogout()
-                }
+                isLoading: viewModel.isLoading,
+                action: viewModel.confirmLogout
             )
         }
         .background(.base)
         .cornerRadius(12)
     }
-    
-    private func profileActionRow(
-        icon: String,
-        title: String,
-        titleColor: Color = .app.textPrimary,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(spacing: 16) {
-                Image(systemName: icon)
-                    .font(.system(size: 20))
-                    .foregroundColor(titleColor == .red ? .red : .primaryVariant)
-                    .frame(width: 28)
-                
-                Text(title)
-                    .font(.app.body(.medium))
-                    .foregroundColor(titleColor)
-                
-                Spacer()
-                
-                if titleColor != .red {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.textPrimary)
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
-
-#Preview {
-    ProfileView()
-        .environmentObject(AuthManager())
-        .environmentObject(AppRouter())
 }

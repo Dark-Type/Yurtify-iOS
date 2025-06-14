@@ -48,6 +48,7 @@ enum L10n {
         static let email = NSLocalizedString("registration.email", comment: "")
         static let password = NSLocalizedString("registration.password", comment: "")
         static let confirmation = NSLocalizedString("registration.confirmation", comment: "")
+        static let alreadyHaveAccount = "registration.already_have_account"
         static let button = NSLocalizedString("registration.button", comment: "")
     }
     

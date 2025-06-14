@@ -23,7 +23,7 @@
 "registration.password" = "Password";
 "registration.confirmation" = "Confirm Password";
 "registration.button" = "Sign Up";
-
+"registration.already_have_account" = "Already have an account?";
 /* Login Screen */
 "login.title" = "Login";
 "login.phone" = "Phone Number";

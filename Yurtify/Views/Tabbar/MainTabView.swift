@@ -40,7 +40,7 @@ struct MainTabView: View {
     
     @ViewBuilder
     private var createTabContent: some View {
-        if authManager.isLoggedIn {
+        if authManager.isAuthenticated {
             CreateView()
         } else {
             RequireLoginView(feature: L10n.TabBar.create) {
@@ -51,7 +51,7 @@ struct MainTabView: View {
     
     @ViewBuilder
     private var notificationsTabContent: some View {
-        if authManager.isLoggedIn {
+        if authManager.isAuthenticated {
             NotificationsView()
         } else {
             RequireLoginView(feature: L10n.TabBar.notifications) {

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct WelcomeActionButtons: View {
+    @ObservedObject var viewModel: WelcomeViewModel
     let authManager: AuthManager
     let appRouter: AppRouter
     let geometry: GeometryProxy
@@ -30,7 +31,7 @@ struct WelcomeActionButtons: View {
             backgroundColor: .secondaryVariant,
             geometry: geometry
         ) {
-            appRouter.navigateToRegister()
+            viewModel.navigateToRegister(appRouter: appRouter)
         }
     }
     
@@ -39,19 +40,27 @@ struct WelcomeActionButtons: View {
             title: L10n.Welcome.login,
             geometry: geometry
         ) {
-            appRouter.navigateToLogin()
+            viewModel.navigateToLogin(appRouter: appRouter)
         }
     }
     
     private var guestButton: some View {
         Button(action: {
-            authManager.continueAsGuest()
-            appRouter.navigateToMain()
+            viewModel.continueAsGuest(authManager: authManager, appRouter: appRouter)
         }) {
-            Text(L10n.Welcome.guest)
-                .font(.app.callout(.medium))
-                .foregroundColor(.app.textSecondary)
-                .underline()
+            HStack(spacing: 8) {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .app.textSecondary))
+                        .scaleEffect(0.8)
+                } else {
+                    Text(L10n.Welcome.guest)
+                        .font(.app.callout(.medium))
+                        .foregroundColor(.app.textSecondary)
+                        .underline()
+                }
+            }
         }
+        .disabled(viewModel.isLoading)
     }
 }

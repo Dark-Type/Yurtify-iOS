@@ -27,7 +27,7 @@ class AppRouter: ObservableObject {
         determineInitialRoute()
     }
     
-    // MARK: - Route Navigation
+    // MARK: - Navigation
     
     func navigateToWelcome() {
         currentRoute = .welcome
@@ -45,55 +45,34 @@ class AppRouter: ObservableObject {
         currentRoute = .main
     }
     
-    // MARK: - Auth Flow Actions
-    
-    func handleSuccessfulLogin() {
-        currentRoute = .main
-    }
-    
-    func handleSuccessfulRegistration() {
-        currentRoute = .main
-    }
+    // MARK: - Auth Flow Actions (Simplified)
     
     func handleLogout() {
         authManager?.logout()
         currentRoute = .welcome
     }
     
-    func handleGuestUpgrade() {
-        authManager?.upgradeFromGuest()
-        currentRoute = .login
-    }
-    
-    // MARK: - Initial Route Determination
+    // MARK: - Route Determination
     
     private func determineInitialRoute() {
         guard let authManager = authManager else { return }
         
-        switch authManager.userState {
-        case .firstLaunch:
-            currentRoute = .welcome
-        case .loggedIn, .guest:
+        if authManager.isAuthenticated {
             currentRoute = .main
-        case .loggedOut:
+        } else {
             currentRoute = .welcome
         }
     }
     
-    // MARK: - Auth State Observer
-    
     func handleAuthStateChange() {
         guard let authManager = authManager else { return }
         
-        switch authManager.userState {
-        case .loggedOut:
-            currentRoute = .welcome
-        case .loggedIn, .guest:
-            if currentRoute == .login || currentRoute == .register {
-                currentRoute = .main
+        if authManager.isAuthenticated {
+            currentRoute = .main
+        } else {
+            if currentRoute != .main {
+                currentRoute = .welcome
             }
-        case .firstLaunch:
-            currentRoute = .welcome
         }
     }
 }

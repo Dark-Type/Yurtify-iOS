@@ -10,6 +10,7 @@ import SwiftUI
 struct WelcomeView: View {
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var appRouter: AppRouter
+    @StateObject private var viewModel = WelcomeViewModel()
     
     var body: some View {
         GeometryReader { geometry in
@@ -21,6 +22,7 @@ struct WelcomeView: View {
                 Spacer()
                 
                 WelcomeActionButtons(
+                    viewModel: viewModel,
                     authManager: authManager,
                     appRouter: appRouter,
                     geometry: geometry

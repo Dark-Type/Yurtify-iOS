@@ -61,7 +61,7 @@ final class KeychainService: Sendable {
         }
     }
     
-    // MARK: - Update User Data (for token refresh)
+    // MARK: - Update User Data
 
     func updateUser(_ user: User) throws {
         try storeUser(user)

@@ -10,13 +10,11 @@ import SwiftUI
 @main
 struct YurtifyApp: App {
     @StateObject private var authManager = AuthManager()
-    @StateObject private var appState = AppState()
 
     var body: some Scene {
         WindowGroup {
             RootNavigationView()
                 .environmentObject(authManager)
-                .environmentObject(appState)
                 .onAppear {
                     authManager.checkAuthenticationStatus()
                 }

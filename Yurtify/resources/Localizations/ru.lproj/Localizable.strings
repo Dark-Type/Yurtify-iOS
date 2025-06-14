@@ -23,6 +23,7 @@
 "registration.password" = "Пароль";
 "registration.confirmation" = "Повторный ввод пароля";
 "registration.button" = "Зарегистрироваться";
+"registration.already_have_account" = "Уже есть аккаунт?";
 
 /* Login Screen */
 "login.title" = "Вход в систему";

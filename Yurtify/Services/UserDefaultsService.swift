@@ -7,37 +7,16 @@
 
 import Foundation
 
-class UserDefaultsService {
+final class UserDefaultsService {
     private enum Keys {
-        static let isFirstLaunch = "isFirstLaunch"
-        static let isUserLoggedIn = "isUserLoggedIn"
-        static let isGuestMode = "isGuestMode"
+        static let shouldBeAuthenticated = "shouldBeAuthenticated"
     }
-    
-    var isFirstLaunch: Bool {
-        if UserDefaults.standard.object(forKey: Keys.isFirstLaunch) == nil {
-            return true
-        }
-        return UserDefaults.standard.bool(forKey: Keys.isFirstLaunch)
+
+    var shouldBeAuthenticated: Bool {
+        UserDefaults.standard.bool(forKey: Keys.shouldBeAuthenticated)
     }
-    
-    var isUserLoggedIn: Bool {
-        UserDefaults.standard.bool(forKey: Keys.isUserLoggedIn)
-    }
-    
-    var isGuestMode: Bool {
-        UserDefaults.standard.bool(forKey: Keys.isGuestMode)
-    }
-    
-    func setFirstLaunch(_ value: Bool) {
-        UserDefaults.standard.set(value, forKey: Keys.isFirstLaunch)
-    }
-    
-    func setUserLoggedIn(_ value: Bool) {
-        UserDefaults.standard.set(value, forKey: Keys.isUserLoggedIn)
-    }
-    
-    func setGuestMode(_ value: Bool) {
-        UserDefaults.standard.set(value, forKey: Keys.isGuestMode)
+
+    func setShouldBeAuthenticated(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: Keys.shouldBeAuthenticated)
     }
 }

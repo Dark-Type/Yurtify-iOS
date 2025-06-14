@@ -25,7 +25,8 @@ struct RootNavigationView: View {
             }
         }
         .environmentObject(appRouter)
-        .onReceive(authManager.$userState) { _ in
+        .environmentObject(authManager)
+        .onReceive(authManager.$isAuthenticated) { _ in
             appRouter.handleAuthStateChange()
         }
         .onAppear {
