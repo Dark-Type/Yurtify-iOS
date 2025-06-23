@@ -74,7 +74,7 @@ struct LocationPickerView: View {
             }) {
                 HStack {
                     Image.appIcon(.search)
-                    Text("Search for address").foregroundStyle(Color.app.textSecondary)
+                    Text("Search for address").foregroundStyle(Color.app.textFade)
                     Spacer()
                 }
                 .padding()

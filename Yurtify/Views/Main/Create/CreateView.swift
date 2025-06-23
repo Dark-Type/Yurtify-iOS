@@ -43,6 +43,7 @@ struct CreateView: View {
             }
             .padding()
         }
+        .background(.base)
         .navigationTitle("Create Listing")
         .onTapGesture {
             focusedField = nil
@@ -64,13 +65,13 @@ struct CreateView: View {
     private var basicDetailsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Basic Details")
-                .font(.app.latoBold(size: 20))
+                .font(.app.largeTitle())
                 .foregroundColor(Color.app.textPrimary)
             
             VStack(alignment: .leading, spacing: 12) {
                 Text("Property Name")
-                    .font(.app.latoRegular(size: 14))
-                    .foregroundColor(Color.app.textFade)
+                    .font(.app.latoBold(size: 18))
+                    .foregroundColor(Color.app.textPrimary)
                 
                 TextField("Enter property name", text: $viewModel.property.name)
                     .font(.app.latoRegular(size: 16))
@@ -88,16 +89,17 @@ struct CreateView: View {
             
             VStack(alignment: .leading, spacing: 12) {
                 Text("Description")
-                    .font(.app.latoRegular(size: 14))
-                    .foregroundColor(Color.app.textFade)
+                    .font(.app.latoRegular(size: 16))
+                    .foregroundColor(Color.app.textPrimary)
                 
                 TextEditor(text: $viewModel.property.description)
                     .frame(minHeight: 120)
                     .font(.app.latoRegular(size: 16))
                     .foregroundColor(Color.app.textPrimary)
-                    .padding(4)
+                    .scrollContentBackground(.hidden)
                     .background(Color.app.accentLight)
                     .cornerRadius(12)
+                    .padding(4)
                     .focused($focusedField, equals: .description)
                     .modifier(ShakeEffect(shaking: viewModel.invalidFields.contains(.description)))
                     .overlay(
@@ -168,7 +170,7 @@ struct CreateView: View {
                 .padding()
                 .background(Color.app.accentLight)
                 .cornerRadius(12)
-                .accentColor(Color.app.primaryVariant)
+                .accentColor(Color.app.textPrimary)
             }
         }
     }
@@ -198,6 +200,7 @@ struct CreateView: View {
                     )
                     .frame(height: CGFloat((Convenience.inGroup(group).count + 3) / 4) * 110)
                 }
+                .padding(.vertical)
             }
         }
     }

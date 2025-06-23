@@ -43,7 +43,7 @@ struct ConvenienceGrid: View {
             let totalContentWidth = (fixedItemWidth * CGFloat(columns)) + (spacing * CGFloat(columns - 1))
             let horizontalPadding = (geometry.size.width - totalContentWidth) / 2
             
-            ScrollView {
+   
                 VStack(spacing: spacing) {
                     ForEach(0..<(conveniences.count + columns - 1) / columns, id: \.self) { rowIndex in
                         HStack(spacing: spacing) {
@@ -85,7 +85,7 @@ struct ConvenienceGrid: View {
                 }
                 .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, spacing)
-            }
+            
         }
     }
 }
