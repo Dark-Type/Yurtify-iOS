@@ -152,9 +152,9 @@
 "detail.meals.no_meals" = "Без питания";
 
 /* Measures - Prices */
-"measures.price.per_day" = "с / день";
-"measures.price.per_week" = "с / неделю";
-"measures.price.per_month" = "с / месяц";
+"measures.price.per_day" = "/день";
+"measures.price.per_week" = "/неделю";
+"measures.price.per_month" = "/месяц";
 
 /* Measures - Units */
 "measures.units.sqm" = "кв.м";

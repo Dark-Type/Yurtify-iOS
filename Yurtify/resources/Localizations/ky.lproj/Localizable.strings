@@ -151,9 +151,9 @@
 "detail.meals.no_meals" = "Тамактануусуз";
 
 /* Measures - Price */
-"measures.price.per_day" = "с /күнү";
-"measures.price.per_week" = "c / жумасына";
-"measures.price.per_month" = "c / айына";
+"measures.price.per_day" = "/күнү";
+"measures.price.per_week" = "/жумасына";
+"measures.price.per_month" = "/айына";
 
 /* Measures - Units */
 "measures.units.sqm" = "кв.м";

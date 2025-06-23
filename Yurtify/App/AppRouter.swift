@@ -79,7 +79,7 @@ class AppRouter: ObservableObject {
     }
     
     func handleAuthStateChange(newAuthState: Bool) {
-        guard let authManager = authManager, isReady else {
+        if !isReady {
             return
         }
         

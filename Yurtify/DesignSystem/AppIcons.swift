@@ -2,6 +2,7 @@ import SwiftUI
 
 enum AppIcons: String, CaseIterable {
     // MARK: - Property Icons
+
     case addSelected = "AddSelected"
     case addUnselected = "AddUnselected"
     case bath = "Bath"
@@ -43,40 +44,41 @@ enum AppIcons: String, CaseIterable {
     case star = "Star"
     case washingMachine = "WashingMachine"
     case wifi = "Wifi"
-    
+    case spaceOffer = "SpaceOffer"
     
     // MARK: - Computed Properties for Organization
+
     var image: Image {
         Image(self.rawValue)
     }
-    
-
 }
 
 // MARK: - SF Symbols Support (for system icons)
+
 enum SFSymbols: String, CaseIterable {
-    case house = "house"
+    case house
     case houseFill = "house.fill"
     case magnifyingGlass = "magnifyingglass"
-    case person = "person"
+    case person
     case personFill = "person.fill"
     case gear = "gearshape"
     case gearFill = "gearshape.fill"
-    case heart = "heart"
+    case heart
     case heartFill = "heart.fill"
-    case star = "star"
+    case star
     case starFill = "star.fill"
     
     var image: Image {
         Image(systemName: self.rawValue)
     }
 }
+
 extension Image {
     static func appIcon(_ icon: AppIcons) -> Image {
         return icon.image
     }
-    
 }
+
 extension AppIcons {
     func toggleState(isSelected: Bool) -> AppIcons {
         switch self {
@@ -100,7 +102,6 @@ extension AppIcons {
             return isSelected ? .addSelected : .addUnselected
         case .addUnselected:
             return isSelected ? .addSelected : .addUnselected
-            
         default:
             return self
         }

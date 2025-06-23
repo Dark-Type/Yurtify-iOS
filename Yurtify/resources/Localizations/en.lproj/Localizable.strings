@@ -153,9 +153,9 @@
 
 /* Measures - Prices */
 
-"measures.price.per_day" = "per day";
-"measures.price.per_week" = "per week";
-"measures.price.per_month" = "per month";
+"measures.price.per_day" = " per day";
+"measures.price.per_week" = " per week";
+"measures.price.per_month" = " per month";
 
 /* Measures - Units */
 "measures.units.sqm" = "sq.m";

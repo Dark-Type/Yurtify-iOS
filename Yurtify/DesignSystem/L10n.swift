@@ -10,19 +10,19 @@ import Foundation
 enum L10n {
     // MARK: - Language Detection
 
-    private static var currentLanguage: String {
+    static var currentLanguage: String {
         return Locale.current.language.languageCode?.identifier ?? "en"
     }
     
-    private static var isRussian: Bool {
+    static var isRussian: Bool {
         return currentLanguage == "ru"
     }
     
-    private static var isKyrgyz: Bool {
+    static var isKyrgyz: Bool {
         return currentLanguage == "ky"
     }
     
-    private static var isEnglish: Bool {
+    static var isEnglish: Bool {
         return currentLanguage == "en"
     }
     
@@ -315,15 +315,15 @@ enum L10n {
                 let formattedAmount = formatter.string(from: NSNumber(value: amount)) ?? "\(Int(amount))"
                 
                 if L10n.isKyrgyz {
-                    return "\(formattedAmount) сом \(period.localized)"
+                    return "\(formattedAmount) сом\(period.localized)"
                 } else {
-                    return "\(formattedAmount) с \(period.localized)"
+                    return "\(formattedAmount) с\(period.localized)"
                 }
             } else {
                 formatter.currencySymbol = "$"
                 formatter.numberStyle = .currency
                 let formattedAmount = formatter.string(from: NSNumber(value: amount)) ?? "$\(Int(amount))"
-                return "\(formattedAmount) \(period.localized)"
+                return "\(formattedAmount)\(period.localized)"
             }
         }
         
