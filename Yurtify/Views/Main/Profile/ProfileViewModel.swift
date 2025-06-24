@@ -58,7 +58,7 @@ class ProfileViewModel: ObservableObject {
             
             await MainActor.run {
                 authManager.logout()
-                appRouter.handleLogout()
+                appRouter.navigateToWelcome()
                 isLoading = false
                 showingLogoutConfirmation = false
             }

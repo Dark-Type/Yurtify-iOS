@@ -39,19 +39,13 @@ struct RootNavigationView: View {
         }
         .environmentObject(appRouter)
         .environmentObject(authManager)
-        .onReceive(authManager.$isAuthenticated) { isAuthenticated in
-
-            if !authManager.isInitializing {
-                appRouter.handleAuthStateChange(newAuthState: isAuthenticated)
+        .onChange(of: authManager.isInitializing) { isInitializing in
+            if !isInitializing {
+                appRouter.setAuthManager(authManager)
             }
         }
         .onAppear {
             if !authManager.isInitializing {
-                appRouter.setAuthManager(authManager)
-            }
-        }
-        .onChange(of: authManager.isInitializing) { isInitializing in
-            if !isInitializing {
                 appRouter.setAuthManager(authManager)
             }
         }

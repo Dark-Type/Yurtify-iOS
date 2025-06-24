@@ -5,6 +5,7 @@
 //  Created by dark type on 14.06.2025.
 //
 
+import Combine
 import SwiftUI
 
 enum AppRoute {
@@ -18,24 +19,36 @@ enum AppRoute {
 class AppRouter: ObservableObject {
     @Published var currentRoute: AppRoute = .welcome
     
-    private var authManager: AuthManager?
-    private var isReady = false
-    
-    // MARK: - Setup
+    private let userDefaultsService = UserDefaultsService()
+    private let keychainService = KeychainService()
+    private var cancellables = Set<AnyCancellable>()
     
     func setAuthManager(_ authManager: AuthManager) {
-        self.authManager = authManager
-        
-        Task {
-            try? await Task.sleep(nanoseconds: 100_000_000)
-            await MainActor.run {
-                determineInitialRoute()
-                isReady = true
-            }
+        if authManager.isAuthenticated {
+            currentRoute = .main
+        } else if userDefaultsService.shouldBeAuthenticated {
+            currentRoute = .login
+        } else if let _ = keychainService.getUserData() {
+            currentRoute = .login
+        } else {
+            currentRoute = .welcome
         }
+        
+        authManager.$isAuthenticated
+            .dropFirst()
+            .sink { [weak self] isAuthenticated in
+                self?.handleAuthStateChange(newAuthState: isAuthenticated)
+            }
+            .store(in: &cancellables)
     }
     
-    // MARK: - Navigation
+    func handleAuthStateChange(newAuthState: Bool) {
+        if newAuthState {
+            currentRoute = .main
+        } else {
+            currentRoute = .login
+        }
+    }
     
     func navigateToWelcome() {
         currentRoute = .welcome
@@ -51,44 +64,5 @@ class AppRouter: ObservableObject {
     
     func navigateToMain() {
         currentRoute = .main
-    }
-    
-    // MARK: - Auth Flow Actions
-    
-    func handleLogout() {
-        authManager?.logout()
-        
-        currentRoute = .welcome
-        
-        Task {
-            try? await Task.sleep(nanoseconds: 200_000_000)
-            await MainActor.run {
-                print("✅ Logout navigation complete")
-            }
-        }
-    }
-    
-    // MARK: - Route Determination
-    
-    private func determineInitialRoute() {
-        guard let authManager = authManager else {
-            return
-        }
-        
-        currentRoute = authManager.isAuthenticated ? .main : .welcome
-    }
-    
-    func handleAuthStateChange(newAuthState: Bool) {
-        if !isReady {
-            return
-        }
-        
-        if newAuthState {
-            currentRoute = .main
-        } else {
-            if currentRoute == .main {
-                currentRoute = .welcome
-            }
-        }
     }
 }

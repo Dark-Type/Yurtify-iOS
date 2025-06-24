@@ -96,7 +96,7 @@ private extension OfferView {
             
             Text("C \(offer.startDate.formatted(date: .abbreviated, time: .omitted)) до \(offer.endDate.formatted(date: .abbreviated, time: .omitted))")
                 .font(.app.latoRegular(size: 12))
-                .foregroundColor(.textPrimary)
+                .foregroundColor(Color.app.textPrimary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
