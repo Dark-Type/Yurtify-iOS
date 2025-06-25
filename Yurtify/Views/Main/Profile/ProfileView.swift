@@ -163,16 +163,19 @@ struct ProfileView: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(viewModel.favoriteOffers) { offer in
-                        OfferView(offer: offer)
-                            .background(Color.app.base)
-                            .cornerRadius(12)
+                        NavigationLink(destination: OfferDetailView(offer: offer, onDismiss: {})) {
+                            OfferView(offer: offer)
+                                .background(Color.app.base)
+                                .cornerRadius(12)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
         }
         .background(Color.app.base)
     }
-    
+
     // MARK: - My Properties Section
     
     private var myPropertiesSection: some View {
@@ -187,9 +190,12 @@ struct ProfileView: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(viewModel.ownedOffers) { offer in
-                        OfferView(offer: offer)
-                            .background(Color.app.base)
-                            .cornerRadius(12)
+                        NavigationLink(destination: OfferDetailView(offer: offer, onDismiss: {})) {
+                            OfferView(offer: offer)
+                                .background(Color.app.base)
+                                .cornerRadius(12)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
@@ -211,9 +217,12 @@ struct ProfileView: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(viewModel.bookingHistory) { offer in
-                        OfferView(offer: offer)
-                            .background(Color.app.base)
-                            .cornerRadius(12)
+                        NavigationLink(destination: OfferDetailView(offer: offer, onDismiss: {})) {
+                            OfferView(offer: offer)
+                                .background(Color.app.base)
+                                .cornerRadius(12)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }

@@ -336,7 +336,7 @@ struct OfferDetailView: View {
             }
         }
         .padding(.horizontal)
-        .padding(.bottom, 100) 
+        .padding(.bottom, 100)
     }
     
     // MARK: - Gallery Section
@@ -372,11 +372,16 @@ struct OfferDetailView: View {
                 .padding(.horizontal)
             
             ForEach(viewModel.similarOffers) { offer in
-                OfferView(offer: offer)
-                    .padding(.bottom, 8)
+                NavigationLink {
+                    OfferDetailView(offer: offer, onDismiss: onDismiss)
+                } label: {
+                    OfferView(offer: offer)
+                        .padding(.bottom, 8)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
         }
-        .padding(.horizontal)
+        .padding(.vertical)
     }
     
     // MARK: - Bottom Action Bar
