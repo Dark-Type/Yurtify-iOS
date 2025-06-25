@@ -356,7 +356,6 @@ struct OfferDetailView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(12)
-                        .frame(width: .infinity, height: 200)
                 }
             }
             .padding(.horizontal)
