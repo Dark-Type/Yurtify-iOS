@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct NotificationsView: View {
     @StateObject private var viewModel = NotificationsViewModel()
     
@@ -16,7 +14,7 @@ struct NotificationsView: View {
         NavigationStack {
             List {
                 ForEach(groupedNotifications.keys.sorted(by: >), id: \.self) { date in
-                    Section(header: Text(sectionTitle(for: date))) {
+                    Section {
                         ForEach(groupedNotifications[date] ?? []) { notification in
                             NotificationItemView(notification: notification) {
                                 viewModel.markAsRead(notification)
@@ -24,6 +22,16 @@ struct NotificationsView: View {
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
+                        }
+                    } header: {
+                        SectionHeaderBackground {
+                            HStack {
+                                Text(sectionTitle(for: date))
+                                    .font(.app.headline())
+                                    .foregroundColor(.app.textPrimary)
+                                    .padding(.vertical, 8)
+                                Spacer()
+                            }
                         }
                     }
                     .listSectionSeparator(.hidden)
@@ -34,7 +42,10 @@ struct NotificationsView: View {
             .background(Color.app.base)
             .navigationTitle(L10n.TabBar.notifications)
             .navigationBarTitleDisplayMode(.large)
-            .navigationTitleColor(.app.textPrimary)
+            .customNavigationBarAppearance(
+                backgroundColor: Color.app.base,
+                titleColor: Color.app.textPrimary
+            )
         }
     }
     
@@ -86,9 +97,26 @@ struct NotificationsView: View {
     }
 }
 
-struct NotificationsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NotificationsView()
+struct SectionHeaderBackground<Content: View>: View {
+    let content: Content
+    
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    var body: some View {
+        content
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .background(
+                GeometryReader { geometry in
+                    Color.app.base
+                        .frame(width: geometry.size.width + 32)
+                        .offset(x: -16)
+                }
+            )
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .textCase(nil)
     }
 }
 
