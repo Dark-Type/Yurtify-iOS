@@ -12,6 +12,13 @@ enum NotificationType {
     case customer
 }
 
+enum NotificationActionState {
+    case pending
+    case approved
+    case declined
+    case cancelled
+}
+
 struct NotificationItem: Identifiable {
     let id = UUID()
     let type: NotificationType
@@ -20,6 +27,8 @@ struct NotificationItem: Identifiable {
     let timestamp: Date
     var isRead: Bool
     let userContacts: UserContacts
+    var actionState: NotificationActionState = .pending
+    var isReservationActive: Bool = true
 }
 
 class NotificationsViewModel: ObservableObject {
@@ -35,28 +44,26 @@ class NotificationsViewModel: ObservableObject {
         }
     }
     
+    func approveRentOffer(_ notification: NotificationItem) {
+        if let index = notifications.firstIndex(where: { $0.id == notification.id }) {
+            notifications[index].actionState = .approved
+        }
+    }
+    
+    func declineRentOffer(_ notification: NotificationItem) {
+        if let index = notifications.firstIndex(where: { $0.id == notification.id }) {
+            notifications[index].actionState = .declined
+        }
+    }
+    
+    func cancelReservation(_ notification: NotificationItem) {
+        if let index = notifications.firstIndex(where: { $0.id == notification.id }) {
+            notifications[index].actionState = .cancelled
+        }
+    }
+    
     private func loadMockData() {
         let calendar = Calendar.current
-        
-        _ = UserContacts(
-            image: Image("ownerAvatar")
-                .resizable(),
-            firstName: "Alex",
-            lastName: "Smith",
-            patronymic: nil,
-            email: "alex.smith@example.com",
-            phoneNumber: "+1 (555) 123-4567"
-        )
-        
-        _ = UserContacts(
-            image: Image("customerAvatar")
-                .resizable(),
-            firstName: "Maria",
-            lastName: "Johnson",
-            patronymic: "Ivanovna",
-            email: "maria.johnson@example.com",
-            phoneNumber: "+1 (555) 987-6543"
-        )
         
         let placeholderOwnerContact = UserContacts(
             image: Image(systemName: "person.circle.fill")
@@ -78,7 +85,6 @@ class NotificationsViewModel: ObservableObject {
             phoneNumber: "+1 (555) 987-6543"
         )
         
-        // Today's notifications
         let now = Date()
         notifications.append(NotificationItem(
             type: .owner,
@@ -86,7 +92,9 @@ class NotificationsViewModel: ObservableObject {
             description: L10n.Notifications.confirmation,
             timestamp: now.addingTimeInterval(-3600),
             isRead: false,
-            userContacts: placeholderOwnerContact
+            userContacts: placeholderOwnerContact,
+            actionState: .pending,
+            isReservationActive: true
         ))
         
         notifications.append(NotificationItem(
@@ -95,7 +103,9 @@ class NotificationsViewModel: ObservableObject {
             description: L10n.Notifications.client,
             timestamp: now.addingTimeInterval(-7200),
             isRead: true,
-            userContacts: placeholderCustomerContact
+            userContacts: placeholderCustomerContact,
+            actionState: .pending,
+            isReservationActive: true
         ))
         
         if let yesterday = calendar.date(byAdding: .day, value: -1, to: now) {
@@ -105,7 +115,9 @@ class NotificationsViewModel: ObservableObject {
                 description: L10n.Notifications.confirmation,
                 timestamp: yesterday.addingTimeInterval(-3600),
                 isRead: true,
-                userContacts: placeholderOwnerContact
+                userContacts: placeholderOwnerContact,
+                actionState: .approved,
+                isReservationActive: true
             ))
             
             notifications.append(NotificationItem(
@@ -114,7 +126,9 @@ class NotificationsViewModel: ObservableObject {
                 description: L10n.Notifications.client,
                 timestamp: yesterday.addingTimeInterval(-7200),
                 isRead: false,
-                userContacts: placeholderCustomerContact
+                userContacts: placeholderCustomerContact,
+                actionState: .pending,
+                isReservationActive: false
             ))
         }
         
@@ -125,7 +139,9 @@ class NotificationsViewModel: ObservableObject {
                 description: L10n.Notifications.confirmation,
                 timestamp: lastWeek,
                 isRead: true,
-                userContacts: placeholderOwnerContact
+                userContacts: placeholderOwnerContact,
+                actionState: .declined,
+                isReservationActive: true
             ))
         }
         
@@ -136,7 +152,9 @@ class NotificationsViewModel: ObservableObject {
                 description: L10n.Notifications.client,
                 timestamp: oldDate,
                 isRead: true,
-                userContacts: placeholderCustomerContact
+                userContacts: placeholderCustomerContact,
+                actionState: .cancelled,
+                isReservationActive: true
             ))
         }
     }

@@ -16,9 +16,13 @@ struct NotificationsView: View {
                 ForEach(groupedNotifications.keys.sorted(by: >), id: \.self) { date in
                     Section {
                         ForEach(groupedNotifications[date] ?? []) { notification in
-                            NotificationItemView(notification: notification) {
-                                viewModel.markAsRead(notification)
-                            }
+                            NotificationItemView(
+                                notification: notification,
+                                viewModel: viewModel,
+                                onTap: {
+                                    viewModel.markAsRead(notification)
+                                }
+                            )
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
@@ -35,6 +39,14 @@ struct NotificationsView: View {
                         }
                     }
                     .listSectionSeparator(.hidden)
+                }
+                
+                Section {
+                    Color.clear
+                        .frame(height: 150)
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.app.base)
                 }
             }
             .listStyle(PlainListStyle())

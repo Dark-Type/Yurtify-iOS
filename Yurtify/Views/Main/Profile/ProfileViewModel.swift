@@ -5,6 +5,7 @@
 //  Created by dark type on 15.06.2025.
 //
 
+import PhotosUI
 import SwiftUI
 
 @MainActor
@@ -18,6 +19,15 @@ class ProfileViewModel: ObservableObject {
     @Published var favoriteOffers: [UnifiedPropertyModel] = []
     @Published var ownedOffers: [UnifiedPropertyModel] = []
     @Published var bookingHistory: [UnifiedPropertyModel] = []
+    
+    @Published var showingImagePicker = false
+    @Published var showingCamera = false
+    @Published var selectedPhotoItem: PhotosPickerItem?
+    @Published var userProfileImage: UIImage?
+    @Published var isProcessingImage = false
+    
+    @Published var showingEditProfile = false
+    @Published var showingChangePassword = false
     
     init() {
         loadOffers()
@@ -115,16 +125,70 @@ class ProfileViewModel: ObservableObject {
         ]
     }
     
+    // MARK: - Image Picker Methods
+    
+    func showPhotosPicker() {
+        showingImagePicker = true
+    }
+    
+    func showCamera() {
+        showingCamera = true
+    }
+    
+    func processSelectedPhoto() {
+        guard let selectedPhotoItem = selectedPhotoItem else { return }
+        
+        isProcessingImage = true
+        
+        Task {
+            do {
+                if let data = try await selectedPhotoItem.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data)
+                {
+                    await MainActor.run {
+                        self.userProfileImage = image
+                        self.isProcessingImage = false
+                        self.selectedPhotoItem = nil
+                    }
+                    
+                    await uploadProfileImage(image)
+                }
+            } catch {
+                await MainActor.run {
+                    self.isProcessingImage = false
+                    self.selectedPhotoItem = nil
+                }
+                print("Failed to process image: \(error)")
+            }
+        }
+    }
+    
+    func addCameraImage(_ image: UIImage) {
+        userProfileImage = image
+        showingCamera = false
+        
+        Task {
+            await uploadProfileImage(image)
+        }
+    }
+    
+    private func uploadProfileImage(_ image: UIImage) async {
+        do {
+            try await Task.sleep(for: .seconds(1))
+            print("Profile image uploaded successfully")
+        } catch {
+            print("Failed to upload profile image: \(error)")
+        }
+    }
+    
     // MARK: - Existing Actions
     
     func editProfile() {
-        // TODO: Navigate to edit profile
-        print("Navigate to edit profile")
+        showingEditProfile = true
     }
     
     func changePassword() {
-        // TODO: Navigate to change password
-        print("Navigate to change password")
+        showingChangePassword = true
     }
     
     func showFavorites() {
