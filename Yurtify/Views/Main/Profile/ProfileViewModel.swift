@@ -9,7 +9,7 @@ import PhotosUI
 import SwiftUI
 
 @MainActor
-class ProfileViewModel: ObservableObject {
+class ProfileViewModel: ObservableObject, Sendable {
     // MARK: - Published Properties
     
     @Published var isLoading = false
@@ -21,6 +21,14 @@ class ProfileViewModel: ObservableObject {
     @Published var bookingHistory: [UnifiedPropertyModel] = []
     
     @Published var showingImagePicker = false
+    @Published var isUploadingImage = false
+    @Published var uploadedImageId: String?
+    @Published var uploadError: String?
+    
+    // MARK: - API Service
+
+    nonisolated let apiService = APIService()
+    
     @Published var showingCamera = false
     @Published var selectedPhotoItem: PhotosPickerItem?
     @Published var userProfileImage: UIImage?
@@ -151,7 +159,7 @@ class ProfileViewModel: ObservableObject {
                         self.selectedPhotoItem = nil
                     }
                     
-                    await uploadProfileImage(image)
+                     uploadProfileImage(image)
                 }
             } catch {
                 await MainActor.run {
@@ -167,20 +175,60 @@ class ProfileViewModel: ObservableObject {
         userProfileImage = image
         showingCamera = false
         
+        uploadProfileImage(image)
+    }
+    
+    func uploadProfileImage(_ image: UIImage) {
+        testHTTPConnection()
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            uploadError = "Failed to convert image to data"
+            return
+        }
+        
+        isUploadingImage = true
+        uploadError = nil
+        
         Task {
-            await uploadProfileImage(image)
+            do {
+                let response = try await apiService.uploadImage(
+                    imageData: imageData,
+                    filename: "profile_image.jpg"
+                )
+                
+                await MainActor.run {
+                    self.uploadedImageId = response.imageId
+                    self.isUploadingImage = false
+                    print("Image uploaded successfully with ID: \(response.imageId ?? "dunno")")
+                }
+                
+            } catch {
+                await MainActor.run {
+                    self.uploadError = error.localizedDescription
+                    self.isUploadingImage = false
+                    print("Upload failed: \(error.localizedDescription)")
+                }
+            }
         }
     }
-    
-    private func uploadProfileImage(_ image: UIImage) async {
-        do {
-            try await Task.sleep(for: .seconds(1))
-            print("Profile image uploaded successfully")
-        } catch {
-            print("Failed to upload profile image: \(error)")
+    func testHTTPConnection() {
+        Task {
+            do {
+                let url = URL(string: "http://77.110.105.134:8080/")!
+                let (_, response) = try await URLSession.shared.data(from: url)
+                
+                if let httpResponse = response as? HTTPURLResponse {
+                    await MainActor.run {
+                        print("HTTP Test successful! Status: \(httpResponse.statusCode)")
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    print("HTTP Test failed: \(error.localizedDescription)")
+                }
+            }
         }
     }
-    
+
     // MARK: - Existing Actions
     
     func editProfile() {

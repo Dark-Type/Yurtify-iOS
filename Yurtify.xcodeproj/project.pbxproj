@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A52EB57F2E11BA9700823ACD /* openapi.yaml in Resources */ = {isa = PBXBuildFile; fileRef = A52EB57E2E11BA9700823ACD /* openapi.yaml */; };
+		A52EB5812E11BAD200823ACD /* openapi-generator-config.yaml in Resources */ = {isa = PBXBuildFile; fileRef = A52EB5802E11BAC100823ACD /* openapi-generator-config.yaml */; };
+		A52EB58E2E11BE5500823ACD /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = A52EB58D2E11BE5500823ACD /* OpenAPIRuntime */; };
+		A52EB5B32E11C54100823ACD /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = A52EB5B22E11C54100823ACD /* OpenAPIURLSession */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A551CAE72DFD69F30020E814 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A52EB57E2E11BA9700823ACD /* openapi.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = openapi.yaml; sourceTree = "<group>"; };
+		A52EB5802E11BAC100823ACD /* openapi-generator-config.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = "openapi-generator-config.yaml"; sourceTree = "<group>"; };
 		A551CAD92DFD69F10020E814 /* Yurtify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yurtify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A551CAE62DFD69F30020E814 /* YurtifyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YurtifyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A551CAF02DFD69F30020E814 /* YurtifyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YurtifyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,6 +74,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A52EB5B32E11C54100823ACD /* OpenAPIURLSession in Frameworks */,
+				A52EB58E2E11BE5500823ACD /* OpenAPIRuntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,13 +96,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A52EB58C2E11BE5500823ACD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A551CAD02DFD69F10020E814 = {
 			isa = PBXGroup;
 			children = (
 				A551CADB2DFD69F10020E814 /* Yurtify */,
 				A551CAE92DFD69F30020E814 /* YurtifyTests */,
 				A551CAF32DFD69F30020E814 /* YurtifyUITests */,
+				A52EB58C2E11BE5500823ACD /* Frameworks */,
 				A551CADA2DFD69F10020E814 /* Products */,
+				A52EB57E2E11BA9700823ACD /* openapi.yaml */,
+				A52EB5802E11BAC100823ACD /* openapi-generator-config.yaml */,
 			);
 			sourceTree = "<group>";
 		};
@@ -119,12 +140,15 @@
 			buildRules = (
 			);
 			dependencies = (
+				A52EB5852E11BDCD00823ACD /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A551CADB2DFD69F10020E814 /* Yurtify */,
 			);
 			name = Yurtify;
 			packageProductDependencies = (
+				A52EB58D2E11BE5500823ACD /* OpenAPIRuntime */,
+				A52EB5B22E11C54100823ACD /* OpenAPIURLSession */,
 			);
 			productName = Yurtify;
 			productReference = A551CAD92DFD69F10020E814 /* Yurtify.app */;
@@ -210,6 +234,11 @@
 			);
 			mainGroup = A551CAD02DFD69F10020E814;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A52EB5822E11BB9F00823ACD /* XCRemoteSwiftPackageReference "swift-openapi-generator" */,
+				A52EB5882E11BE1B00823ACD /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */,
+				A52EB5B12E11C54100823ACD /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A551CADA2DFD69F10020E814 /* Products */;
 			projectDirPath = "";
@@ -227,6 +256,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A52EB5812E11BAD200823ACD /* openapi-generator-config.yaml in Resources */,
+				A52EB57F2E11BA9700823ACD /* openapi.yaml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +302,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		A52EB5852E11BDCD00823ACD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A52EB5842E11BDCD00823ACD /* OpenAPIGenerator */;
+		};
 		A551CAE82DFD69F30020E814 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A551CAD82DFD69F10020E814 /* Yurtify */;
@@ -416,6 +451,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QN79D4T9G3;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Yurtify/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Yurtify;
@@ -455,6 +491,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QN79D4T9G3;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Yurtify/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Yurtify;
@@ -597,6 +634,51 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A52EB5822E11BB9F00823ACD /* XCRemoteSwiftPackageReference "swift-openapi-generator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-generator";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.0;
+			};
+		};
+		A52EB5882E11BE1B00823ACD /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-runtime";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.2;
+			};
+		};
+		A52EB5B12E11C54100823ACD /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-urlsession.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A52EB5842E11BDCD00823ACD /* OpenAPIGenerator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A52EB5822E11BB9F00823ACD /* XCRemoteSwiftPackageReference "swift-openapi-generator" */;
+			productName = "plugin:OpenAPIGenerator";
+		};
+		A52EB58D2E11BE5500823ACD /* OpenAPIRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A52EB5882E11BE1B00823ACD /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */;
+			productName = OpenAPIRuntime;
+		};
+		A52EB5B22E11C54100823ACD /* OpenAPIURLSession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A52EB5B12E11C54100823ACD /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
+			productName = OpenAPIURLSession;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A551CAD12DFD69F10020E814 /* Project object */;
 }

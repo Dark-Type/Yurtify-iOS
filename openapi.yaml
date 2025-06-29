@@ -1,0 +1,964 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://77.110.105.134:8080
+    description: Generated server url
+paths:
+  /visit/post:
+    post:
+      tags:
+        - visit-history-controller
+      operationId: addVisit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              format: uuid
+        required: true
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: []
+  /reservations/create:
+    post:
+      tags:
+        - reservation-controller
+      operationId: createReservation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreateDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReservationResponseDTO'
+      security:
+        - bearerAuth: []
+  /images/upload:
+    post:
+      tags:
+        - image-controller
+      operationId: uploadImage
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ImageUploadResponseDTO'
+      security:
+        - bearerAuth: []
+  /housing/create:
+    post:
+      tags:
+        - housing-controller
+      operationId: createHousing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HousingCreateDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/HousingResponseDTO'
+      security:
+        - bearerAuth: []
+  /favorites/{housingId}:
+    post:
+      tags:
+        - favorite-controller
+      operationId: addFavorite
+      parameters:
+        - name: housingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - favorite-controller
+      operationId: removeFavorite
+      parameters:
+        - name: housingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: []
+  /auth/register:
+    post:
+      tags:
+        - auth-controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequestDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TokenResponseDTO'
+  /auth/refresh:
+    post:
+      tags:
+        - auth-controller
+      operationId: refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequestDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TokenResponseDTO'
+  /auth/logout:
+    post:
+      tags:
+        - auth-controller
+      operationId: logout
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: []
+  /auth/login:
+    post:
+      tags:
+        - auth-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TokenResponseDTO'
+  /user/profile:
+    get:
+      tags:
+        - user-controller
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - user-controller
+      operationId: editUserProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdateDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+      security:
+        - bearerAuth: []
+  /user/password:
+    patch:
+      tags:
+        - user-controller
+      operationId: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+      security:
+        - bearerAuth: []
+  /reservations/{id}/status:
+    patch:
+      tags:
+        - reservation-controller
+      operationId: updateReservationStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationStatusUpdateDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReservationResponseDTO'
+      security:
+        - bearerAuth: []
+  /visit/get-all:
+    get:
+      tags:
+        - visit-history-controller
+      operationId: getVisitHistory
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageDTOHousingResponseDTO'
+      security:
+        - bearerAuth: []
+  /user/{id}:
+    get:
+      tags:
+        - user-controller
+      operationId: getUserPublicInfo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+  /reservations/owner-reservations:
+    get:
+      tags:
+        - reservation-controller
+      operationId: getOwnerReservations
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponseDTO'
+      security:
+        - bearerAuth: []
+  /reservations/my-reservations:
+    get:
+      tags:
+        - reservation-controller
+      operationId: getUserReservations
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponseDTO'
+      security:
+        - bearerAuth: []
+  /images/{id}:
+    get:
+      tags:
+        - image-controller
+      operationId: getImage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+      security:
+        - bearerAuth: []
+  /housing/{id}:
+    get:
+      tags:
+        - housing-controller
+      operationId: getHousingById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/HousingResponseDTO'
+  /housing/{id}/reserved-dates:
+    get:
+      tags:
+        - housing-controller
+      operationId: getReservedDates
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DateRangeDTO'
+  /housing/owner/{ownerId}:
+    get:
+      tags:
+        - housing-controller
+      operationId: getHousingsByOwnerId
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageDTOHousingResponseDTO'
+  /housing/get:
+    get:
+      tags:
+        - housing-controller
+      operationId: getAllHousings
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+        - name: title
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: address
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - COTTAGE
+              - ROOM
+              - HOTEL
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageDTOHousingResponseDTO'
+      security:
+        - bearerAuth: []
+  /favorites:
+    get:
+      tags:
+        - favorite-controller
+      operationId: getUserFavorites
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageDTOHousingResponseDTO'
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    ReservationCreateDTO:
+      type: object
+      properties:
+        housingId:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+    ReservationResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        housingId:
+          type: string
+          format: uuid
+        housingTitle:
+          type: string
+        userId:
+          type: string
+          format: uuid
+        userFullName:
+          type: string
+        userEmail:
+          type: string
+        userPhone:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        totalCost:
+          type: number
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+            - CANCELLED
+            - COMPLETED
+    ImageUploadResponseDTO:
+      type: object
+      properties:
+        imageId:
+          type: string
+          format: uuid
+    HousingCreateDTO:
+      type: object
+      properties:
+        title:
+          type: string
+        addressName:
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        cost:
+          type: number
+        period:
+          type: string
+          enum:
+            - DAY
+            - WEEK
+            - MONTH
+        bedsCount:
+          type: integer
+          format: int32
+        roomsCount:
+          type: integer
+          format: int32
+        placeAmount:
+          type: integer
+          format: int32
+        maxPeople:
+          type: integer
+          format: int32
+        type:
+          type: string
+          enum:
+            - COTTAGE
+            - ROOM
+            - HOTEL
+        properties:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - HOTEL
+              - BOARDING_HOUSE
+              - PRIVATE_SECTOR
+              - GUEST_HOUSE
+              - CHILDREN_CAMP
+              - CAMPING
+              - RECREATION_CENTER
+        territoryConveniences:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - SPA
+              - BARBEQUE
+              - BASKETBALL
+              - SWIMMING_POOL
+              - TRAMPOLINE
+              - POOL_TABLE
+              - PLAYGROUND
+              - PRIVATE_BEACH
+              - KUMYS_TREATMENT
+              - GUARDED
+              - PARKING
+              - SAUNA
+              - TENNIS
+              - GYM
+              - FOOTBALL
+        roomAmenities:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - WIFI
+              - BALCONY
+              - BATH_SUPPLIES
+              - SEPARATE_SHOWER
+              - AIR_CONDITIONTING
+              - KITCHEN
+              - MICROWAVE
+              - STOVE
+              - SEPARATE_BATHROOM
+              - SATELLITE_TV
+              - WASHING_MACHINE
+              - TERRACE
+              - CLEANING
+              - IRON
+              - HAIR_DRYER
+              - REFRIGERATOR
+              - KETTLE
+              - HEATING
+        features:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - CAFE
+              - RESTAURANT
+              - GORGES
+              - FOREST
+              - HOT_SPRINGS
+        galleryIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            format: uuid
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+    HousingResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        addressName:
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        cost:
+          type: number
+        period:
+          type: string
+          enum:
+            - DAY
+            - WEEK
+            - MONTH
+        bedsCount:
+          type: integer
+          format: int32
+        roomsCount:
+          type: integer
+          format: int32
+        placeAmount:
+          type: integer
+          format: int32
+        maxPeople:
+          type: integer
+          format: int32
+        type:
+          type: string
+          enum:
+            - COTTAGE
+            - ROOM
+            - HOTEL
+        owner:
+          $ref: '#/components/schemas/OwnerDTO'
+        properties:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - HOTEL
+              - BOARDING_HOUSE
+              - PRIVATE_SECTOR
+              - GUEST_HOUSE
+              - CHILDREN_CAMP
+              - CAMPING
+              - RECREATION_CENTER
+        territoryConveniences:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - SPA
+              - BARBEQUE
+              - BASKETBALL
+              - SWIMMING_POOL
+              - TRAMPOLINE
+              - POOL_TABLE
+              - PLAYGROUND
+              - PRIVATE_BEACH
+              - KUMYS_TREATMENT
+              - GUARDED
+              - PARKING
+              - SAUNA
+              - TENNIS
+              - GYM
+              - FOOTBALL
+        roomAmenities:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - WIFI
+              - BALCONY
+              - BATH_SUPPLIES
+              - SEPARATE_SHOWER
+              - AIR_CONDITIONTING
+              - KITCHEN
+              - MICROWAVE
+              - STOVE
+              - SEPARATE_BATHROOM
+              - SATELLITE_TV
+              - WASHING_MACHINE
+              - TERRACE
+              - CLEANING
+              - IRON
+              - HAIR_DRYER
+              - REFRIGERATOR
+              - KETTLE
+              - HEATING
+        features:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+              - CAFE
+              - RESTAURANT
+              - GORGES
+              - FOREST
+              - HOT_SPRINGS
+        galleryIds:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            format: uuid
+        isFavorite:
+          type: boolean
+    OwnerDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+    RegisterRequestDTO:
+      required:
+        - email
+        - fullName
+        - password
+        - phone
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&_])[A-Za-z\d@$!%*#?&_]{8,}$'
+          type: string
+        fullName:
+          $ref: '#/components/schemas/UserFullNameDTO'
+        phone:
+          pattern: '^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s]?[0-9]{4,6}$'
+          type: string
+    UserFullNameDTO:
+      required:
+        - name
+        - surname
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        patronymic:
+          type: string
+    TokenResponseDTO:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    RefreshRequestDTO:
+      required:
+        - refreshToken
+      type: object
+      properties:
+        refreshToken:
+          type: string
+    LoginRequestDTO:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    UserFullName:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        patronymic:
+          type: string
+    UserProfileUpdateDTO:
+      type: object
+      properties:
+        imageId:
+          type: string
+          format: uuid
+        phone:
+          pattern: '^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s]?[0-9]{4,6}$'
+          type: string
+        fullName:
+          $ref: '#/components/schemas/UserFullName'
+        email:
+          type: string
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        fullName:
+          $ref: '#/components/schemas/UserFullNameDTO'
+        phone:
+          type: string
+        imageId:
+          type: string
+          format: uuid
+    ChangePasswordDTO:
+      required:
+        - currentPassword
+        - newPassword
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          pattern: '^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&_])[A-Za-z\d@$!%*#?&_]{8,}$'
+          type: string
+    ReservationStatusUpdateDTO:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+            - CANCELLED
+            - COMPLETED
+    PageDTOHousingResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/HousingResponseDTO'
+        currentPage:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+    DateRangeDTO:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
