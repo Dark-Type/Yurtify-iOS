@@ -247,7 +247,6 @@ struct OfferDetailView: View {
                     MeasuresRow(
                         area: .constant(property.area),
                         beds: .constant(Double(property.bedsCount)),
-                        bathrooms: .constant(Double(property.bathroomsCount)),
                         capacity: .constant(Double(property.maxOccupancy))
                     )
                     .frame(height: 120)
@@ -474,7 +473,6 @@ struct OfferDetailView: View {
             startDate: Date(),
             endDate: Date().addingTimeInterval(86400 * 30),
             bedsCount: 2,
-            bathroomsCount: 1,
             area: 65.0,
             period: .perMonth,
             maxOccupancy: 4,

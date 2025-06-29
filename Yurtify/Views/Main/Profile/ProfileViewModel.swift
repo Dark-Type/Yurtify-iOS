@@ -32,7 +32,6 @@ class ProfileViewModel: ObservableObject {
                 startDate: Date(),
                 endDate: Date().addingTimeInterval(86400 * 30),
                 bedsCount: 1,
-                bathroomsCount: 1,
                 area: 35.0,
                 maxOccupancy: 2,
                 isFavorited: true
@@ -44,7 +43,6 @@ class ProfileViewModel: ObservableObject {
                 startDate: Date(),
                 endDate: Date().addingTimeInterval(86400 * 30),
                 bedsCount: 2,
-                bathroomsCount: 2,
                 area: 85.0,
                 maxOccupancy: 4,
                 isFavorited: true
@@ -59,7 +57,6 @@ class ProfileViewModel: ObservableObject {
                 startDate: Date(),
                 endDate: Date().addingTimeInterval(86400 * 30),
                 bedsCount: 3,
-                bathroomsCount: 2,
                 area: 110.0,
                 maxOccupancy: 6,
                 isOwner: true
@@ -71,7 +68,6 @@ class ProfileViewModel: ObservableObject {
                 startDate: Date(),
                 endDate: Date().addingTimeInterval(86400 * 30),
                 bedsCount: 2,
-                bathroomsCount: 1,
                 area: 65.0,
                 maxOccupancy: 3,
                 isOwner: true
@@ -86,7 +82,6 @@ class ProfileViewModel: ObservableObject {
                 startDate: Date().addingTimeInterval(-86400 * 60),
                 endDate: Date().addingTimeInterval(-86400 * 30),
                 bedsCount: 2,
-                bathroomsCount: 2,
                 area: 70.0,
                 maxOccupancy: 4,
                 isOccupied: true
@@ -98,7 +93,6 @@ class ProfileViewModel: ObservableObject {
                 startDate: Date().addingTimeInterval(-86400 * 120),
                 endDate: Date().addingTimeInterval(-86400 * 90),
                 bedsCount: 1,
-                bathroomsCount: 1,
                 area: 50.0,
                 maxOccupancy: 2,
                 isOccupied: true

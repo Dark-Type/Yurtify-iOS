@@ -10,14 +10,12 @@ import SwiftUI
 enum MeasureType {
     case area
     case beds
-    case bathrooms
     case capacity
     
     var icon: AppIcons {
         switch self {
         case .area: return .space
         case .beds: return .bed
-        case .bathrooms: return .bath
         case .capacity: return .place
         }
     }
@@ -28,8 +26,6 @@ enum MeasureType {
             return L10n.Measures.formatArea(value)
         case .beds:
             return L10n.Measures.formatBeds(Int(value))
-        case .bathrooms:
-            return L10n.Measures.formatBathrooms(Int(value))
         case .capacity:
             return L10n.Measures.formatCapacity(Int(value))
         }

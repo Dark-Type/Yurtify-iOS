@@ -150,7 +150,7 @@ struct CompactUserProfileView: View {
             UIApplication.shared.open(url)
         }
     }
-    
+
     private func sendEmail(_ email: String) {
         if let url = URL(string: "mailto:\(email)"),
            UIApplication.shared.canOpenURL(url)

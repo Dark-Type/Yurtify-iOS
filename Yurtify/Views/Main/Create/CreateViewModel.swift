@@ -5,37 +5,63 @@
 //  Created by dark type on 23.06.2025.
 //
 
+import AVFoundation
+import PhotosUI
 import SwiftUI
 
 @MainActor
 final class CreateViewModel: ObservableObject {
-    @Published var property = PropertyModel()
+    @Published var property = UnifiedPropertyModel()
     @Published var selectedPropertyType: PropertyType?
     @Published var selectedConveniences = Set<Convenience>()
     @Published var priceText = ""
+    @Published var areaText = ""
     
-    // Form validation
+    @Published var startDate = Date()
+    @Published var endDate = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
+    @Published var unavailableDates = Set<Date>()
+    @Published var selectedUnavailableDate: Date?
+    @Published var isSelectingUnavailableDates = false
+    
+    @Published var selectedImages: [PropertyImage] = []
+    @Published var selectedPhotoItems: [PhotosPickerItem] = []
+    @Published var showingImagePicker = false
+    @Published var showingCamera = false
+    @Published var isProcessingImages = false
+    
+    @Published var posterImage: PropertyImage?
+    @Published var posterPhotoItems: [PhotosPickerItem] = []
+    @Published var showingPosterPicker = false
+    @Published var isProcessingPosterImage = false
+    @Published var showingPosterSelectionSheet = false
+    
     @Published var invalidFields = Set<ValidationField>()
     
-    // Computed properties for MeasuresRow
+    @Published var propertyAddress = Address()
+    
     var area: Double {
-        get { property.area }
-        set { property.area = newValue }
+        get { Double(property.placeAmount) }
+        set {
+            property.placeAmount = Int(newValue)
+            areaText = String(Int(newValue))
+        }
     }
     
     var beds: Double {
-        get { Double(property.beds) }
-        set { property.beds = Int(newValue) }
+        get { Double(property.bedsCount) }
+        set { property.bedsCount = Int(newValue) }
     }
     
-    var bathrooms: Double {
-        get { Double(property.bathrooms) }
-        set { property.bathrooms = Int(newValue) }
-    }
+   
     
     var capacity: Double {
-        get { Double(property.capacity) }
-        set { property.capacity = Int(newValue) }
+        get { Double(property.maxPeople) }
+        set { property.maxPeople = Int(newValue) }
+    }
+    
+    var rooms: Double {
+        get { Double(property.roomsCount) }
+        set { property.roomsCount = Int(newValue) }
     }
     
     enum ValidationField: Hashable {
@@ -45,6 +71,15 @@ final class CreateViewModel: ObservableObject {
         case measurements
         case price
         case location
+        case dates
+        case images
+        case poster
+    }
+    
+    init() {
+        property.firstFreeDate = startDate
+        property.firstClosedDate = endDate
+        areaText = "0"
     }
     
     // MARK: - Form Validation
@@ -52,13 +87,11 @@ final class CreateViewModel: ObservableObject {
     func validateForm() -> Bool {
         invalidFields.removeAll()
         
-        // Validate name
-        if property.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if property.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             invalidFields.insert(.name)
         }
         
-        // Validate description
-        if property.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if property.addressName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             invalidFields.insert(.description)
         }
         
@@ -66,28 +99,231 @@ final class CreateViewModel: ObservableObject {
             invalidFields.insert(.propertyType)
         }
         
-        if property.area <= 0 || property.beds <= 0 || property.bathrooms <= 0 || property.capacity <= 0 {
+        if let areaValue = Int(areaText), areaValue > 0 {
+            property.placeAmount = areaValue
+        } else {
+            invalidFields.insert(.measurements)
+        }
+        
+        if property.placeAmount <= 0 || property.bedsCount <= 0 ||  property.maxPeople <= 0 {
             invalidFields.insert(.measurements)
         }
         
         let cleanedPrice = priceText.replacingOccurrences(of: ",", with: ".")
         if let price = Double(cleanedPrice), price > 0 {
-            property.price = price
+            property.cost = price
         } else {
             invalidFields.insert(.price)
         }
         
-        if property.address.city.isEmpty || property.address.coordinates.latitude == 0 {
+        property.coordinates = propertyAddress.coordinates
+        property.addressName = propertyAddress.formattedAddress
+        
+        if propertyAddress.coordinates.latitude == 0 {
             invalidFields.insert(.location)
+        }
+        
+        if startDate >= endDate {
+            invalidFields.insert(.dates)
+        }
+        
+        if selectedImages.isEmpty {
+            invalidFields.insert(.images)
+        }
+        
+        if posterImage == nil {
+            invalidFields.insert(.poster)
         }
         
         if let type = selectedPropertyType {
             property.propertyType = type.rawValue
         }
         
-        property.conveniences = selectedConveniences.map { $0.rawValue }
+        property.properties = selectedConveniences.map { $0.rawValue }
+        property.firstFreeDate = startDate
+        property.firstClosedDate = endDate
+        property.closedDates = Array(unavailableDates)
         
         return invalidFields.isEmpty
+    }
+    
+    // MARK: - Date Management
+    
+    func addUnavailableDate(_ date: Date) {
+        unavailableDates.insert(date)
+    }
+    
+    func removeUnavailableDate(_ date: Date) {
+        unavailableDates.remove(date)
+    }
+    
+    func isDateUnavailable(_ date: Date) -> Bool {
+        unavailableDates.contains(date)
+    }
+    
+    func toggleUnavailableDate(_ date: Date) {
+        if unavailableDates.contains(date) {
+            unavailableDates.remove(date)
+        } else {
+            unavailableDates.insert(date)
+        }
+    }
+    
+    // MARK: - Apple's Recommended Permission Handling
+    
+    func showPhotosPicker() {
+        selectedPhotoItems.removeAll()
+        showingImagePicker = true
+    }
+    
+    func showCamera() {
+        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+            return
+        }
+        
+        showingCamera = true
+    }
+    
+    // MARK: - Poster Image Management
+    
+    func showPosterSelection() {
+        showingPosterSelectionSheet = true
+    }
+    
+    func showPosterPicker() {
+        showingPosterPicker = true
+    }
+    
+    func selectPosterFromGallery(_ image: PropertyImage) {
+        posterImage = image
+    }
+    
+    func processPosterPhoto() {
+        guard !posterPhotoItems.isEmpty && !isProcessingPosterImage else {
+            return
+        }
+        
+        isProcessingPosterImage = true
+        
+        Task {
+            if let posterPhotoItem = posterPhotoItems.first {
+                do {
+                    if let data = try await posterPhotoItem.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data)
+                    {
+                        let propertyImage = PropertyImage(image: uiImage)
+                        
+                        await MainActor.run {
+                            self.posterImage = propertyImage
+                            self.posterPhotoItems.removeAll()
+                            self.isProcessingPosterImage = false
+                        }
+                    } else {
+                        await MainActor.run {
+                            self.posterPhotoItems.removeAll()
+                            self.isProcessingPosterImage = false
+                        }
+                    }
+                } catch {
+                    await MainActor.run {
+                        self.posterPhotoItems.removeAll()
+                        self.isProcessingPosterImage = false
+                    }
+                }
+            }
+        }
+    }
+    
+    func removePosterImage() {
+        posterImage = nil
+    }
+    
+    // MARK: - Image Management with PhotosUI
+    
+    func processSelectedPhotos() {
+        guard !selectedPhotoItems.isEmpty && !isProcessingImages else {
+            return
+        }
+        
+        isProcessingImages = true
+        
+        Task {
+            var loadedImages: [PropertyImage] = []
+            
+            for (index, item) in selectedPhotoItems.enumerated() {
+                do {
+                    
+                    if let data = try await item.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        let propertyImage = PropertyImage(image: uiImage)
+                        loadedImages.append(propertyImage)
+                    } else {
+                    }
+                } catch {
+                }
+            }
+            
+            await MainActor.run {
+                self.selectedImages.append(contentsOf: loadedImages)
+                self.selectedPhotoItems.removeAll()
+                self.isProcessingImages = false
+                
+                if self.posterImage == nil && !loadedImages.isEmpty {
+                    self.posterImage = loadedImages.first
+                }
+            }
+        }
+    }
+    
+    func addCameraImage(_ image: UIImage) {
+        print("📷 Adding camera image")
+        let propertyImage = PropertyImage(image: image)
+        selectedImages.append(propertyImage)
+        
+        if posterImage == nil {
+            posterImage = propertyImage
+        }
+        
+    }
+    
+    func removeImage(at index: Int) {
+        guard index < selectedImages.count else {
+            return
+        }
+        
+        let imageToRemove = selectedImages[index]
+        selectedImages.remove(at: index)
+        
+        if posterImage?.id == imageToRemove.id {
+            posterImage = nil
+        }
+        
+    }
+    
+    // MARK: - Mock Image Upload
+    
+    private func uploadImages() async -> [String] {
+        var uploadedUrls: [String] = []
+        
+        for (index, propertyImage) in selectedImages.enumerated() {
+            try? await Task.sleep(for: .milliseconds(500))
+            
+            let mockUrl = "https://mock-storage.com/properties/\(property.id)/image_\(index).jpg"
+            uploadedUrls.append(mockUrl)
+        }
+        
+        return uploadedUrls
+    }
+    
+    private func uploadPosterImage() async -> String? {
+        guard let posterImage = posterImage else {
+            return nil
+        }
+        
+        try? await Task.sleep(for: .milliseconds(300))
+        
+        let mockUrl = "https://mock-storage.com/properties/\(property.id)/poster.jpg"
+        return mockUrl
     }
     
     // MARK: - Property Creation
@@ -95,16 +331,26 @@ final class CreateViewModel: ObservableObject {
     func createPropertyAsync() async -> (success: Bool, message: String) {
         property.createdAt = Date()
         property.updatedAt = Date()
+        property.isOwn = true
         
-        property.ownerId = UUID().uuidString
+        if let posterUrl = await uploadPosterImage() {
+            property.posterUrl = posterUrl
+        }
         
-        // Log property data
+        let uploadedUrls = await uploadImages()
+        property.galleryUrls = uploadedUrls
+        
+        property.owner = OwnerDto(
+            fullName: "Current User",
+            email: "user@example.com",
+            phone: "+996 XXX XXX XXX",
+            imageUrl: "https://mock-storage.com/users/current/avatar.jpg"
+        )
+        
         logPropertyData()
         
-        // Simulate network delay
         try? await Task.sleep(for: .seconds(1.5))
         
-        // In production, this would be an API call
         return (true, "Property created successfully!")
     }
     
@@ -118,12 +364,16 @@ final class CreateViewModel: ObservableObject {
     // MARK: - Helper Methods
     
     private func logPropertyData() {
-        print("Creating property: \(property.name)")
-        print("Type: \(property.propertyType)")
-        print("Measurements: \(property.area)m², \(property.beds) beds, \(property.bathrooms) bathrooms, \(property.capacity) people")
-        print("Price: \(property.price) \(property.pricePeriod.rawValue)")
-        print("Address: \(property.address.formattedAddress)")
-        print("Coordinates: \(property.address.coordinates.latitude), \(property.address.coordinates.longitude)")
-        print("Conveniences: \(property.conveniences)")
+        print("🏠 Creating property: \(property.title)")
+        print("🏠 Type: \(property.propertyType)")
+        print("🏠 Price: \(property.cost) \(property.period.rawValue)")
+        print("🏠 Address: \(property.addressName)")
+        print("🏠 Coordinates: \(property.coordinates.latitude), \(property.coordinates.longitude)")
+        print("🏠 Available from: \(property.firstFreeDate)")
+        print("🏠 Available until: \(property.firstClosedDate?.description ?? "No end date")")
+        print("🏠 Unavailable dates: \(property.closedDates)")
+        print("🏠 Conveniences: \(property.properties)")
+        print("🏠 Poster URL: \(property.posterUrl)")
+        print("🏠 Gallery Images: \(property.galleryUrls.count) uploaded")
     }
 }

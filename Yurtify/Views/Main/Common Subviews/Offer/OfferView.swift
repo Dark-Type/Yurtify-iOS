@@ -14,6 +14,10 @@ struct OfferView: View {
         self._offer = State(initialValue: offer)
     }
     
+    init(property: UnifiedPropertyModel) {
+        self._offer = State(initialValue: property.toOffer())
+    }
+    
     var body: some View {
         VStack(spacing: 16) {
             headerSection
@@ -109,11 +113,6 @@ private extension OfferView {
             )
             
             propertyDetailItem(
-                icon: .bath,
-                text: L10n.Measures.formatBathrooms(offer.bathroomsCount)
-            )
-            
-            propertyDetailItem(
                 icon: .space,
                 text: L10n.Measures.formatArea(offer.area)
             )
@@ -141,7 +140,7 @@ private extension OfferView {
     var triangleCornerElement: some View {
         TriangleCornerElement(
             count: offer.maxOccupancy,
-            isOccupied: offer.isOccupied
+            isOccupied: false
         )
         .frame(width: 60, height: 60)
     }
@@ -175,7 +174,7 @@ struct TriangleCornerElement: View {
                 path.addLine(to: CGPoint(x: 0, y: 60))
                 path.closeSubpath()
             }
-            .fill(isOccupied ? .textFade : .primaryVariant)
+            .fill(Color.app.primaryVariant)
             
             Text("\(count)" + L10n.Measures.Unit.people.localized)
                 .font(.caption2)
@@ -190,7 +189,16 @@ struct TriangleCornerElement: View {
 
 #Preview {
     VStack(spacing: 20) {
-        OfferView(offer: Offer(title: "Красивая квартира в центре", address: "Бишкек, ул. Ленина, 10", price: 100000.0, startDate: Date.now, endDate: Date.now.addingTimeInterval(86400), bedsCount: 2, bathroomsCount: 1, area: 85.5, period: .perDay, maxOccupancy: 4))
+        OfferView(offer: Offer(
+            title: "Красивая квартира в центре",
+            address: "Бишкек, ул. Ленина, 10",
+            price: 100000.0,
+            startDate: Date.now,
+            endDate: Date.now.addingTimeInterval(86400),
+            bedsCount: 2,
+            area: 65.0,
+            maxOccupancy: 4
+        ))
 
         OfferView(offer: Offer(
             title: "Моя квартира для сдачи",
@@ -199,12 +207,10 @@ struct TriangleCornerElement: View {
             startDate: Date.now,
             endDate: Date.now.addingTimeInterval(86400),
             bedsCount: 1,
-            bathroomsCount: 1,
             area: 45.0,
             maxOccupancy: 2,
             isOwner: true,
-            isRented: true,
-            isOccupied: true
+            isRented: true
         ))
     }
     .padding()

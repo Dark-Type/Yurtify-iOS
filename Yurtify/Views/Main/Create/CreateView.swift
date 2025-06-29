@@ -5,6 +5,8 @@
 //  Created by dark type on 14.06.2025.
 //
 
+import AVFoundation
+import PhotosUI
 import SwiftUI
 
 struct CreateView: View {
@@ -20,6 +22,7 @@ struct CreateView: View {
         case name
         case description
         case price
+        case area
     }
     
     // MARK: - Body
@@ -36,6 +39,12 @@ struct CreateView: View {
                 priceSection
                 
                 locationSection
+                
+                availabilitySection
+                
+                imageUploadSection
+                
+                posterImageSection
                 
                 conveniencesSection
                 
@@ -55,12 +64,55 @@ struct CreateView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        .photosPicker(
+            isPresented: $viewModel.showingImagePicker,
+            selection: $viewModel.selectedPhotoItems,
+            maxSelectionCount: 30,
+            matching: .images,
+        )
+        .photosPicker(
+            isPresented: $viewModel.showingPosterPicker,
+            selection: $viewModel.posterPhotoItems,
+            maxSelectionCount: 1,
+            matching: .images
+        )
+        .fullScreenCover(isPresented: $viewModel.showingCamera) {
+            ImagePicker(
+                sourceType: .camera,
+                onImageSelected: { image in
+                    viewModel.addCameraImage(image)
+                },
+                onCancel: {
+                    viewModel.showingCamera = false
+                }
+            )
+        }
+        .sheet(isPresented: $viewModel.showingPosterSelectionSheet) {
+            PosterSelectionSheet(
+                galleryImages: viewModel.selectedImages,
+                onSelectFromGallery: { image in
+                    viewModel.selectPosterFromGallery(image)
+                },
+                onSelectFromLibrary: {
+                    viewModel.showPosterPicker()
+                },
+                isPresented: $viewModel.showingPosterSelectionSheet
+            )
+        }
         .fullScreenCover(isPresented: $isShowingSuccessView) {
             successView
         }
+        .onChange(of: viewModel.selectedPhotoItems) { _ in
+            if !viewModel.selectedPhotoItems.isEmpty {
+                viewModel.processSelectedPhotos()
+            }
+        }
+        .onChange(of: viewModel.posterPhotoItems) { _ in
+            if !viewModel.posterPhotoItems.isEmpty {
+                viewModel.processPosterPhoto()
+            }
+        }
     }
-    
-    // MARK: - Sections
     
     private var basicDetailsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -73,7 +125,7 @@ struct CreateView: View {
                     .font(.app.latoBold(size: 18))
                     .foregroundColor(Color.app.textPrimary)
                 
-                TextField("Enter property name", text: $viewModel.property.name)
+                TextField("Enter property name", text: $viewModel.property.title)
                     .font(.app.latoRegular(size: 16))
                     .foregroundColor(Color.app.textPrimary)
                     .padding()
@@ -92,7 +144,7 @@ struct CreateView: View {
                     .font(.app.latoRegular(size: 16))
                     .foregroundColor(Color.app.textPrimary)
                 
-                TextEditor(text: $viewModel.property.description)
+                TextEditor(text: $viewModel.property.addressName)
                     .frame(minHeight: 120)
                     .font(.app.latoRegular(size: 16))
                     .foregroundColor(Color.app.textPrimary)
@@ -128,16 +180,17 @@ struct CreateView: View {
                 .font(.app.latoBold(size: 18))
                 .foregroundColor(Color.app.textPrimary)
             
-            MeasuresRow(
-                area: $viewModel.area,
+            EnhancedMeasuresRow(
+                areaText: $viewModel.areaText,
                 beds: $viewModel.beds,
-                bathrooms: $viewModel.bathrooms,
-                capacity: $viewModel.capacity
+                rooms: $viewModel.rooms,
+                capacity: $viewModel.capacity,
+                focusedField: $focusedField
             )
-            .frame(height: 110)
+            .frame(height: 130)
         }
     }
-    
+
     private var priceSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Price")
@@ -159,7 +212,7 @@ struct CreateView: View {
                             .stroke(viewModel.invalidFields.contains(.price) ? Color.red : Color.clear, lineWidth: 1)
                     )
                 
-                Picker("Period", selection: $viewModel.property.pricePeriod) {
+                Picker("Period", selection: $viewModel.property.period) {
                     ForEach(L10n.Measures.Price.allCases, id: \.self) { period in
                         Text(period.localized)
                             .tag(period)
@@ -181,8 +234,295 @@ struct CreateView: View {
                 .font(.app.latoBold(size: 18))
                 .foregroundColor(Color.app.textPrimary)
             
-            LocationPickerView(address: $viewModel.property.address)
+            LocationPickerView(address: $viewModel.propertyAddress)
                 .modifier(ShakeEffect(shaking: viewModel.invalidFields.contains(.location)))
+        }
+    }
+    
+    private var availabilitySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Availability")
+                .font(.app.latoBold(size: 18))
+                .foregroundColor(Color.app.textPrimary)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Rental Period")
+                    .font(.app.latoBold(size: 16))
+                    .foregroundColor(Color.app.textPrimary)
+                
+                HStack(spacing: 16) {
+                    VStack(alignment: .leading) {
+                        Text("Start Date")
+                            .font(.app.latoRegular(size: 14))
+                            .foregroundColor(Color.app.textFade)
+                        
+                        DatePicker("", selection: $viewModel.startDate, displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .labelsHidden()
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("End Date")
+                            .font(.app.latoRegular(size: 14))
+                            .foregroundColor(Color.app.textFade)
+                        
+                        DatePicker("", selection: $viewModel.endDate, displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .labelsHidden()
+                    }
+                }
+                .modifier(ShakeEffect(shaking: viewModel.invalidFields.contains(.dates)))
+            }
+            
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("Unavailable Dates")
+                        .font(.app.latoBold(size: 16))
+                        .foregroundColor(Color.app.textPrimary)
+                    
+                    Spacer()
+                    
+                    Button(viewModel.isSelectingUnavailableDates ? "Done" : "Select") {
+                        viewModel.isSelectingUnavailableDates.toggle()
+                    }
+                    .font(.app.latoRegular(size: 14))
+                    .foregroundColor(Color.app.primaryVariant)
+                }
+                
+                if viewModel.isSelectingUnavailableDates {
+                    Text("Tap dates to mark as unavailable")
+                        .font(.app.latoRegular(size: 12))
+                        .foregroundColor(Color.app.textFade)
+                    
+                    CalendarView(
+                        unavailableDates: $viewModel.unavailableDates,
+                        startDate: viewModel.startDate,
+                        endDate: viewModel.endDate
+                    )
+                    .frame(height: 300)
+                }
+                
+                if !viewModel.unavailableDates.isEmpty {
+                    Text("Unavailable: \(viewModel.unavailableDates.count) date(s)")
+                        .font(.app.latoRegular(size: 12))
+                        .foregroundColor(Color.app.textFade)
+                }
+            }
+        }
+    }
+    
+    private var imageUploadSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Property Images")
+                .font(.app.latoBold(size: 18))
+                .foregroundColor(Color.app.textPrimary)
+            
+            HStack(spacing: 12) {
+                Button(action: {
+                    print("🔘 Gallery button tapped - Using Apple's PhotosPicker")
+                    viewModel.showPhotosPicker()
+                }) {
+                    HStack {
+                        Image(systemName: "photo.on.rectangle")
+                        Text("Gallery")
+                    }
+                    .font(.app.latoRegular(size: 14))
+                    .foregroundColor(Color.app.primaryVariant)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.app.accentLight)
+                    .cornerRadius(8)
+                }
+                .disabled(viewModel.isProcessingImages)
+                
+                Button(action: {
+                    print("🔘 Camera button tapped - Using Apple's ImagePicker")
+                    viewModel.showCamera()
+                }) {
+                    HStack {
+                        Image(systemName: "camera")
+                        Text("Camera")
+                    }
+                    .font(.app.latoRegular(size: 14))
+                    .foregroundColor(Color.app.primaryVariant)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.app.accentLight)
+                    .cornerRadius(8)
+                }
+                .disabled(viewModel.isProcessingImages)
+                
+                if viewModel.isProcessingImages {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Processing...")
+                            .font(.app.latoRegular(size: 12))
+                            .foregroundColor(Color.app.textFade)
+                    }
+                    .padding(.horizontal, 8)
+                }
+                
+                Spacer()
+            }
+            
+            if !viewModel.selectedImages.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(Array(viewModel.selectedImages.enumerated()), id: \.element.id) { index, propertyImage in
+                            ZStack(alignment: .topTrailing) {
+                                Image(uiImage: propertyImage.image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 100, height: 100)
+                                    .clipped()
+                                    .cornerRadius(8)
+    
+                                Button(action: {
+                                    viewModel.removeImage(at: index)
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.red)
+                                        .background(Color.white)
+                                        .clipShape(Circle())
+                                }
+                                .offset(x: 8, y: -8)
+                            }
+                            .padding(.top)
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "photo.badge.plus")
+                        .font(.system(size: 40))
+                        .foregroundColor(Color.app.textFade)
+                    
+                    Text("No images selected")
+                        .font(.app.latoRegular(size: 14))
+                        .foregroundColor(Color.app.textFade)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 120)
+                .background(Color.app.accentLight)
+                .cornerRadius(12)
+                .modifier(ShakeEffect(shaking: viewModel.invalidFields.contains(.images)))
+            }
+        }
+    }
+    
+    private var posterImageSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Poster Image")
+                    .font(.app.latoBold(size: 18))
+                    .foregroundColor(Color.app.textPrimary)
+                
+                Text("*")
+                    .font(.app.latoBold(size: 18))
+                    .foregroundColor(.red)
+                
+                Spacer()
+            }
+            
+            Text("Choose a main image that will represent your property")
+                .font(.app.latoRegular(size: 14))
+                .foregroundColor(Color.app.textFade)
+            
+            if let posterImage = viewModel.posterImage {
+                HStack(spacing: 16) {
+                    Image(uiImage: posterImage.image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 120, height: 120)
+                        .clipped()
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.app.primaryVariant, lineWidth: 2)
+                        )
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Poster Image Selected")
+                            .font(.app.latoBold(size: 16))
+                            .foregroundColor(Color.app.textPrimary)
+                        
+                        Text("This image will be shown as the main photo in property listings")
+                            .font(.app.latoRegular(size: 12))
+                            .foregroundColor(Color.app.textFade)
+                        
+                        HStack(spacing: 8) {
+                            Button("Change") {
+                                viewModel.showPosterSelection()
+                            }
+                            .font(.app.latoRegular(size: 14))
+                            .foregroundColor(Color.app.primaryVariant)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.app.accentLight)
+                            .cornerRadius(8)
+                            
+                            Button("Remove") {
+                                viewModel.removePosterImage()
+                            }
+                            .font(.app.latoRegular(size: 14))
+                            .foregroundColor(.red)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(8)
+                        }
+                    }
+                    
+                    Spacer()
+                }
+            } else {
+                VStack(spacing: 16) {
+                    if viewModel.isProcessingPosterImage {
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Processing poster image...")
+                                .font(.app.latoRegular(size: 14))
+                                .foregroundColor(Color.app.textFade)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 120)
+                        .background(Color.app.accentLight)
+                        .cornerRadius(12)
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "photo.badge.checkmark")
+                                .font(.system(size: 40))
+                                .foregroundColor(Color.app.textFade)
+                            
+                            Text("No poster image selected")
+                                .font(.app.latoRegular(size: 14))
+                                .foregroundColor(Color.app.textFade)
+                            
+                            Button("Select Poster Image") {
+                                viewModel.showPosterSelection()
+                            }
+                            .font(.app.latoBold(size: 14))
+                            .foregroundColor(Color.app.primaryVariant)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color.app.accentLight)
+                            .cornerRadius(8)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 160)
+                        .background(Color.app.accentLight)
+                        .cornerRadius(12)
+                        .modifier(ShakeEffect(shaking: viewModel.invalidFields.contains(.poster)))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(viewModel.invalidFields.contains(.poster) ? Color.red : Color.clear, lineWidth: 1)
+                        )
+                    }
+                }
+            }
         }
     }
     

@@ -77,7 +77,6 @@ final class OfferDetailViewModel: ObservableObject {
                 startDate: Date(),
                 endDate: Date().addingTimeInterval(86400 * 30),
                 bedsCount: 1,
-                bathroomsCount: 1,
                 area: 35.0,
                 maxOccupancy: 2
             ),
@@ -88,7 +87,6 @@ final class OfferDetailViewModel: ObservableObject {
                 startDate: Date(),
                 endDate: Date().addingTimeInterval(86400 * 30),
                 bedsCount: 2,
-                bathroomsCount: 2,
                 area: 85.0,
                 maxOccupancy: 4
             ),
@@ -99,7 +97,6 @@ final class OfferDetailViewModel: ObservableObject {
                 startDate: Date(),
                 endDate: Date().addingTimeInterval(86400 * 30),
                 bedsCount: 3,
-                bathroomsCount: 2,
                 area: 95.0,
                 maxOccupancy: 6
             ),

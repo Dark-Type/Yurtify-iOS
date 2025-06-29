@@ -17,7 +17,6 @@ struct Offer: Identifiable, Equatable {
     let startDate: Date
     let endDate: Date
     let bedsCount: Int
-    let bathroomsCount: Int
     let area: Double
     let maxOccupancy: Int
     let image: Image?
@@ -35,7 +34,6 @@ struct Offer: Identifiable, Equatable {
         startDate: Date,
         endDate: Date,
         bedsCount: Int,
-        bathroomsCount: Int,
         area: Double,
         period: L10n.Measures.Price = .perMonth,
         maxOccupancy: Int,
@@ -54,7 +52,6 @@ struct Offer: Identifiable, Equatable {
         self.startDate = startDate
         self.endDate = endDate
         self.bedsCount = bedsCount
-        self.bathroomsCount = bathroomsCount
         self.area = area
         self.maxOccupancy = maxOccupancy
         self.image = image
@@ -77,7 +74,6 @@ struct Offer: Identifiable, Equatable {
             lhs.startDate == rhs.startDate &&
             lhs.endDate == rhs.endDate &&
             lhs.bedsCount == rhs.bedsCount &&
-            lhs.bathroomsCount == rhs.bathroomsCount &&
             lhs.area == rhs.area &&
             lhs.maxOccupancy == rhs.maxOccupancy &&
             lhs.isOwner == rhs.isOwner &&
