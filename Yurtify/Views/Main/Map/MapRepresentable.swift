@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MapRepresentable: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
-    let offers: [Offer]
+    let offers: [UnifiedPropertyModel]
     let selectedOfferId: String?
     let onSelectOffer: (String) -> Void
     
@@ -59,15 +59,15 @@ struct MapRepresentable: UIViewRepresentable {
             processedOfferIds.insert(offer.id)
             
             if let existingAnnotation = context.coordinator.currentAnnotations[offer.id] {
-                let needsUpdate = existingAnnotation.coordinate.latitude != offer.coordinate.latitude ||
-                    existingAnnotation.coordinate.longitude != offer.coordinate.longitude ||
-                    existingAnnotation.price != offer.price ||
+                let needsUpdate = existingAnnotation.coordinate.latitude != offer.coordinates.latitude ||
+                    existingAnnotation.coordinate.longitude != offer.coordinates.longitude ||
+                existingAnnotation.price != offer.cost ||
                     existingAnnotation.period != offer.period ||
                     existingAnnotation.isSelected != (selectedOfferId == offer.id)
                 
                 if needsUpdate {
-                    existingAnnotation.coordinate = offer.coordinate
-                    existingAnnotation.price = offer.price
+                    existingAnnotation.coordinate = offer.coordinates.clLocation
+                    existingAnnotation.price = offer.cost
                     existingAnnotation.period = offer.period
                     existingAnnotation.isSelected = (selectedOfferId == offer.id)
                     
@@ -79,8 +79,8 @@ struct MapRepresentable: UIViewRepresentable {
             else {
                 let annotation = OfferAnnotation(
                     offerId: offer.id,
-                    coordinate: offer.coordinate,
-                    price: offer.price,
+                    coordinate: offer.coordinates.clLocation,
+                    price: offer.cost,
                     period: offer.period,
                     isSelected: selectedOfferId == offer.id
                 )

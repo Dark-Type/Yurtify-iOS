@@ -11,9 +11,10 @@ struct ProfileView: View {
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var appRouter: AppRouter
     @StateObject private var viewModel = ProfileViewModel()
+    @State private var navigationPath = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             Group {
                 if authManager.isAuthenticated {
                     userProfileContent
@@ -22,6 +23,11 @@ struct ProfileView: View {
                 }
             }
             .navigationTitle(L10n.TabBar.profile)
+            .navigationDestination(for: UnifiedPropertyModel.self) { offer in
+                OfferDetailView(property: offer, onDismiss: {
+                    navigationPath.removeLast()
+                })
+            }
         }
         .confirmationDialog(
             "L10n.Profile.logoutConfirmationTitle",
@@ -163,8 +169,10 @@ struct ProfileView: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(viewModel.favoriteOffers) { offer in
-                        NavigationLink(destination: OfferDetailView(offer: offer, onDismiss: {})) {
-                            OfferView(offer: offer)
+                        Button(action: {
+                            navigationPath.append(offer)
+                        }) {
+                            OfferView(property: offer)
                                 .background(Color.app.base)
                                 .cornerRadius(12)
                         }
@@ -190,8 +198,10 @@ struct ProfileView: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(viewModel.ownedOffers) { offer in
-                        NavigationLink(destination: OfferDetailView(offer: offer, onDismiss: {})) {
-                            OfferView(offer: offer)
+                        Button(action: {
+                            navigationPath.append(offer)
+                        }) {
+                            OfferView(property: offer)
                                 .background(Color.app.base)
                                 .cornerRadius(12)
                         }
@@ -217,8 +227,10 @@ struct ProfileView: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(viewModel.bookingHistory) { offer in
-                        NavigationLink(destination: OfferDetailView(offer: offer, onDismiss: {})) {
-                            OfferView(offer: offer)
+                        Button(action: {
+                            navigationPath.append(offer)
+                        }) {
+                            OfferView(property: offer)
                                 .background(Color.app.base)
                                 .cornerRadius(12)
                         }

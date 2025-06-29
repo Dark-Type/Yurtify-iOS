@@ -13,67 +13,23 @@ struct OfferDetailView: View {
     @State private var selectedImageIndex: Int = 0
     
     let onDismiss: () -> Void
-    
-    init(offer: Offer, onDismiss: @escaping () -> Void) {
-        _viewModel = StateObject(wrappedValue: OfferDetailViewModel(offer: offer))
+
+    init(property: UnifiedPropertyModel, onDismiss: @escaping () -> Void) {
+        _viewModel = StateObject(wrappedValue: OfferDetailViewModel(property: property))
         self.onDismiss = onDismiss
     }
     
-    // MARK: - Main body structure
-
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 Color.app.base.ignoresSafeArea()
                 
-                VStack(spacing: 0) {
-                    ZStack(alignment: .top) {
-                        if let image = viewModel.property?.image {
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
-                                .clipped()
-                                .edgesIgnoringSafeArea(.top)
-                        } else {
-                            Color.gray.opacity(0.3)
-                                .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
-                                .edgesIgnoringSafeArea(.top)
-                            
-                            Image(systemName: "photo.fill")
-                                .font(.system(size: 120))
-                                .foregroundColor(.gray)
-                                .background(Color.gray.opacity(0.1))
-                                .cornerRadius(12)
-                        }
+                ScrollView {
+                    VStack(spacing: 0) {
+                        headerImageSection(geometry: geometry)
                         
-                        HStack {
-                            Button(action: {
-                                onDismiss()
-                            }) {
-                                Image.appIcon(.goBackButton)
-                            }
-                            
-                            Spacer()
-                            
-                            HStack(spacing: 16) {
-                                Button(action: viewModel.shareProperty) {
-                                    Image.appIcon(.shareButton)
-                                }
-                                
-                                Button(action: viewModel.toggleFavorite) {
-                                    Image.appIcon(viewModel.isFavorite ? .favoriteButtonSelected : .favoriteButtonUnselected)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.top, geometry.safeAreaInsets.top + 8)
-                    }
-                    
-                    ScrollView {
                         VStack(spacing: 20) {
                             titleSection
-                            
                             sectionTabsView
                             
                             if viewModel.selectedSectionIndex == 0 {
@@ -86,63 +42,95 @@ struct OfferDetailView: View {
                         }
                         .padding(.top)
                         .padding(.bottom, 100)
+                        .background(Color.app.base)
                     }
+                }
+                .edgesIgnoringSafeArea(.top)
+                
+                VStack {
+                    HStack {
+                        Button(action: onDismiss) {
+                            Image.appIcon(.goBackButton)
+                        }
+                        .background(
+                            Circle()
+                                .fill(Color.white.opacity(0.9))
+                                .frame(width: 40, height: 40)
+                        )
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 16) {
+                            Button(action: viewModel.shareProperty) {
+                                Image.appIcon(.shareButton)
+                            }
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.9))
+                                    .frame(width: 40, height: 40)
+                            )
+                            
+                            Button(action: viewModel.toggleFavorite) {
+                                Image.appIcon(viewModel.isFavorite ? .favoriteButtonSelected : .favoriteButtonUnselected)
+                            }
+                            .background(
+                                Circle()
+                                    .fill(Color.white.opacity(0.9))
+                                    .frame(width: 40, height: 40)
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, geometry.safeAreaInsets.top + 16)
                     
-                    Spacer(minLength: 0)
-                    
-                    bottomActionBar
+                    Spacer()
+                }
+                if !(viewModel.property?.isOwn ?? true) {
+                    VStack {
+                        Spacer()
+                        bottomActionBar
+                    }
                 }
                 
                 if viewModel.isRentSuccessful {
                     rentSuccessOverlay
                 }
             }
-            .edgesIgnoringSafeArea(.top)
             .navigationBarHidden(true)
+            .sheet(isPresented: $viewModel.showingBookingSheet) {
+                BookingDateSheet(
+                    viewModel: viewModel,
+                    isPresented: $viewModel.showingBookingSheet
+                )
+            }
         }
     }
-    
+
     // MARK: - Header Image Section
     
-    private var headerImageSection: some View {
+    private func headerImageSection(geometry: GeometryProxy) -> some View {
         ZStack {
-            if let image = viewModel.property?.image {
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.4)
-                    .clipped()
+            if let property = viewModel.property, !property.posterUrl.isEmpty {
+                AsyncImage(url: URL(string: property.posterUrl)) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Color.gray.opacity(0.3)
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
+                .clipped()
             } else {
-                Color.gray.opacity(0.3)
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.4)
+                ZStack {
+                    Color.gray.opacity(0.3)
+                        .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
+                    
+                    Image(systemName: "photo.fill")
+                        .font(.system(size: 120))
+                        .foregroundColor(.gray)
+                }
             }
         }
-    }
-    
-    // MARK: - Navigation Buttons
-    
-    private var backButton: some View {
-        Button(action: {
-            onDismiss()
-        }) {
-            Image.appIcon(.goBackButton)
-                .padding()
-        }
-        .padding(.top, 16)
-    }
-    
-    private var topRightButtons: some View {
-        HStack(spacing: 16) {
-            Button(action: viewModel.shareProperty) {
-                Image.appIcon(.shareButton)
-            }
-            
-            Button(action: viewModel.toggleFavorite) {
-                Image.appIcon(viewModel.isFavorite ? .favoriteButtonSelected : .favoriteButtonUnselected)
-            }
-        }
-        .padding(.top, 16)
-        .padding(.trailing, 16)
     }
     
     // MARK: - Title Section
@@ -154,14 +142,16 @@ struct OfferDetailView: View {
                     .font(.app.title2())
                     .foregroundColor(.app.textPrimary)
                 
-                Text(viewModel.property?.address ?? "")
+                Text(viewModel.property?.addressName ?? "")
                     .font(.app.footnote())
                     .foregroundColor(.app.textFade)
             }
             
             Spacer()
             
-            if let propertyType = PropertyType(rawValue: "hotel") {
+            if let propertyTypeRaw = viewModel.property?.propertyType,
+               let propertyType = PropertyType(rawValue: propertyTypeRaw)
+            {
                 VStack {
                     Image.appIcon(propertyType.icon)
                         .foregroundColor(.app.primaryVariant)
@@ -178,11 +168,11 @@ struct OfferDetailView: View {
         .padding(.horizontal)
     }
     
-    // MARK: - Section Tabs (Separated from content)
+    // MARK: - Section Tabs
     
     private var sectionTabsView: some View {
         HStack(spacing: 0) {
-            ForEach(0 ..< 3, id: \.self) { index in
+            ForEach(0..<3, id: \.self) { index in
                 let titles = [L10n.Detail.description, L10n.Detail.gallery, L10n.Detail.similar]
                 
                 Button(action: {
@@ -207,135 +197,126 @@ struct OfferDetailView: View {
         .padding(.horizontal)
     }
     
-    // MARK: - Section Content (TabView)
-    
-    private var sectionContentView: some View {
-        TabView(selection: $viewModel.selectedSectionIndex) {
-            ScrollView {
-                descriptionSection
-                    .padding(.top, 16)
-            }
-            .tag(0)
-            
-            ScrollView {
-                gallerySection
-                    .padding(.top, 16)
-            }
-            .tag(1)
-            
-            ScrollView {
-                similarSection
-                    .padding(.top, 16)
-            }
-            .tag(2)
-        }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        .frame(maxWidth: .infinity)
-        .frame(minHeight: UIScreen.main.bounds.height * 0.45)
-    }
-
     // MARK: - Description Section
     
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: 40) {
             if let property = viewModel.property {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Property Details")
-                        .font(.app.headline())
-                        .foregroundColor(.app.textPrimary)
-                    
-                    MeasuresRow(
-                        area: .constant(property.area),
-                        beds: .constant(Double(property.bedsCount)),
-                        capacity: .constant(Double(property.maxOccupancy))
-                    )
-                    .frame(height: 120)
-                    .disabled(true)
-                }
-            }
-            
-            if let owner = viewModel.owner {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(L10n.Detail.owner)
-                        .font(.app.headline())
-                        .foregroundColor(.app.textPrimary)
-                    
-                    HStack(alignment: .center, spacing: 16) {
-                        owner.image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 70, height: 70)
-                            .clipShape(Circle())
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("\(owner.firstName) \(owner.lastName)")
-                                .font(.app.subheadline(.semiBold))
-                                .foregroundColor(.app.textPrimary)
-                            
-                            Text(owner.patronymic ?? "")
-                                .font(.app.subheadline(.semiBold))
-                                .foregroundColor(.app.textPrimary)
-                        }
-                        
-                        Spacer()
-                        
-                        VStack(alignment: .trailing, spacing: 8) {
-                            HStack(spacing: 6) {
-                                Text(owner.email)
-                                    .font(.app.caption1())
-                                    .foregroundColor(.app.textPrimary)
-                                
-                                AppIcons.mail.image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 14, height: 14)
-                                    .foregroundColor(.app.primaryVariant)
-                            }
-                            
-                            HStack(spacing: 6) {
-                                Text(owner.phoneNumber)
-                                    .font(.app.caption1())
-                                    .foregroundColor(.app.textPrimary)
-                                
-                                AppIcons.phone.image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 14, height: 14)
-                                    .foregroundColor(.app.primaryVariant)
-                            }
-                        }
-                    }
-                    .padding(.vertical, 8)
-                }
-            }
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text(L10n.Detail.conveniences)
-                    .font(.app.headline())
-                    .foregroundColor(.app.textPrimary)
-                
-                let allConveniences = Convenience.allCases
-                
-                ConvenienceGrid(conveniences: allConveniences)
-                    .frame(height: CGFloat((allConveniences.count + 3) / 4) * 110)
-                    .padding(.bottom, 20)
-            }
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text(L10n.Detail.address)
-                    .font(.app.headline())
-                    .foregroundColor(.app.textPrimary)
-                    .padding(.top, 10)
-                
-                if let property = viewModel.property {
-                    OfferMapView(coordinate: property.coordinate)
-                        .frame(height: 200)
-                        .cornerRadius(12)
-                }
+                propertyDetailsCard(property: property)
+                ownerCard()
+                conveniencesCard(property: property)
+                mapCard(property: property)
             }
         }
         .padding(.horizontal)
         .padding(.bottom, 100)
+    }
+    
+    private func propertyDetailsCard(property: UnifiedPropertyModel) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Property Details")
+                .font(.app.headline())
+                .foregroundColor(.app.textPrimary)
+            
+            MeasuresRow(
+                area: .constant(Double(property.placeAmount)),
+                beds: .constant(Double(property.bedsCount)),
+                capacity: .constant(Double(property.maxPeople))
+            )
+            .frame(height: 120)
+            .disabled(true)
+        }
+    }
+    
+    private func ownerCard() -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(L10n.Detail.owner)
+                .font(.app.headline())
+                .foregroundColor(.app.textPrimary)
+            
+            if let owner = viewModel.owner, !owner.fullName.isEmpty {
+                HStack(alignment: .center, spacing: 16) {
+                    AsyncImage(url: URL(string: owner.imageUrl)) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 70))
+                            .foregroundColor(.gray)
+                    }
+                    .frame(width: 70, height: 70)
+                    .clipShape(Circle())
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(owner.fullName)
+                            .font(.app.subheadline(.semiBold))
+                            .foregroundColor(.app.textPrimary)
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 8) {
+                        HStack(spacing: 6) {
+                            Text(owner.email)
+                                .font(.app.caption1())
+                                .foregroundColor(.app.textPrimary)
+                            
+                            AppIcons.mail.image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 14, height: 14)
+                                .foregroundColor(.app.primaryVariant)
+                        }
+                        
+                        HStack(spacing: 6) {
+                            Text(owner.phone)
+                                .font(.app.caption1())
+                                .foregroundColor(.app.textPrimary)
+                            
+                            AppIcons.phone.image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 14, height: 14)
+                                .foregroundColor(.app.primaryVariant)
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
+            } else {
+                Text("Owner information not available")
+                    .font(.app.caption1())
+                    .foregroundColor(.app.textFade)
+                    .italic()
+            }
+        }
+    }
+    
+    private func conveniencesCard(property: UnifiedPropertyModel) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(L10n.Detail.conveniences)
+                .font(.app.headline())
+                .foregroundColor(.app.textPrimary)
+            
+            let propertyConveniences = property.properties.compactMap { Convenience(rawValue: $0) }
+            
+            ConvenienceGrid(conveniences: propertyConveniences)
+                .frame(height: CGFloat((propertyConveniences.count + 3) / 4) * 110)
+                .padding(.bottom, 20)
+        }
+    }
+    
+    private func mapCard(property: UnifiedPropertyModel) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(L10n.Detail.address)
+                .font(.app.headline())
+                .foregroundColor(.app.textPrimary)
+                .padding(.top, 10)
+            
+            OfferMapView(coordinate: property.coordinates.clLocation)
+                .frame(height: 200)
+                .cornerRadius(12)
+        }
     }
     
     // MARK: - Gallery Section
@@ -347,17 +328,48 @@ struct OfferDetailView: View {
                 .foregroundColor(.app.textPrimary)
                 .padding(.horizontal)
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(0 ..< viewModel.galleryImages.count, id: \.self) { index in
-                    viewModel.galleryImages[index]
+            if viewModel.isLoadingImages {
+                VStack {
+                    ProgressView()
+                    Text("Loading images...")
+                        .font(.app.caption1())
+                        .foregroundColor(.app.textFade)
+                        .padding(.top, 8)
+                }
+                .frame(height: 200)
+            } else if viewModel.galleryImages.isEmpty {
+                VStack {
+                    Image(systemName: "photo.badge.plus")
                         .font(.system(size: 60))
                         .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(12)
+                    Text("No images available")
+                        .font(.app.caption1())
+                        .foregroundColor(.app.textFade)
                 }
+                .frame(height: 200)
+            } else {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 8),
+                        GridItem(.flexible(), spacing: 8)
+                    ],
+                    spacing: 12
+                ) {
+                    ForEach(0..<viewModel.galleryImages.count, id: \.self) { index in
+                        Image(uiImage: viewModel.galleryImages[index])
+                            .resizable()
+                            .aspectRatio(1, contentMode: .fill)
+                            .frame(maxWidth: .infinity)
+                            .clipped()
+                            .cornerRadius(12)
+                            .onTapGesture {
+                                selectedImageIndex = index
+                                // TODO: Open full screen image viewer
+                            }
+                    }
+                }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
         }
     }
     
@@ -370,17 +382,18 @@ struct OfferDetailView: View {
                 .foregroundColor(.app.textPrimary)
                 .padding(.horizontal)
             
-            ForEach(viewModel.similarOffers) { offer in
-                NavigationLink {
-                    OfferDetailView(offer: offer, onDismiss: onDismiss)
-                } label: {
-                    OfferView(offer: offer)
+            ForEach(viewModel.similarOffers) { property in
+                NavigationLink(value: property) {
+                    OfferView(property: property)
                         .padding(.bottom, 8)
                 }
                 .buttonStyle(PlainButtonStyle())
             }
         }
         .padding(.vertical)
+        .navigationDestination(for: UnifiedPropertyModel.self) { offer in
+            OfferDetailView(property: offer, onDismiss: onDismiss)
+        }
     }
     
     // MARK: - Bottom Action Bar
@@ -393,7 +406,7 @@ struct OfferDetailView: View {
                     .foregroundColor(.app.textFade)
                 
                 Text(L10n.Measures.formatPrice(
-                    viewModel.property?.price ?? 0,
+                    viewModel.property?.cost ?? 0,
                     period: viewModel.property?.period ?? .perMonth
                 ))
                 .font(.app.headline())
@@ -402,7 +415,7 @@ struct OfferDetailView: View {
             
             Spacer()
             
-            Button(action: viewModel.rentProperty) {
+            Button(action: viewModel.showBookingSheet) {
                 Text(L10n.Detail.rent)
                     .font(.app.headline())
                     .foregroundColor(.white)
@@ -462,22 +475,36 @@ struct OfferDetailView: View {
     }
 }
 
+// MARK: - Extensions
+
+extension L10n.Measures.Price {
+    static let total = L10n.Measures.Price(rawValue: "total") ?? .perDay
+}
+
 // MARK: - Preview
 
 #Preview {
-    OfferDetailView(
-        offer: Offer(
-            title: "Cozy Apartment with Lake View",
-            address: "Bishkek, Chuy Avenue 123",
-            price: 25000,
-            startDate: Date(),
-            endDate: Date().addingTimeInterval(86400 * 30),
-            bedsCount: 2,
-            area: 65.0,
-            period: .perMonth,
-            maxOccupancy: 4,
-            coordinate: CLLocationCoordinate2D(latitude: 42.87462, longitude: 74.5698)
-        ),
-        onDismiss: {}
-    )
+    NavigationStack {
+        OfferDetailView(
+            property: UnifiedPropertyModel(id: UUID().uuidString,
+                                           title: "Квартира",
+                                           addressName: "бишкек ",
+                                           coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                           cost: 200000,
+                                           period: .perMonth,
+                                           closedDates: [],
+                                           firstFreeDate: Date(),
+                                           firstClosedDate: nil,
+                                           owner: OwnerDto(
+                                            fullName: "John Doe\nSmith",
+                                            email: "john.doe@example.com",
+                                            phone: "+996 555 123 456",
+                                            imageUrl: "https://example.com/avatar.jpg"
+                                           )
+                                          ),
+                                            
+            
+            onDismiss: {}
+        )
+    }
 }

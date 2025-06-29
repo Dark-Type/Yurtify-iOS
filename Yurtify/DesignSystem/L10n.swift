@@ -235,7 +235,7 @@ enum L10n {
     enum Measures {
         // MARK: - Time Periods
 
-        enum Price: String, CaseIterable, Codable {
+        enum Price: String, CaseIterable, Codable, Hashable {
             case perDay = "measures.price.per_day"
             case perWeek = "measures.price.per_week"
             case perMonth = "measures.price.per_month"

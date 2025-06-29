@@ -15,9 +15,9 @@ class ProfileViewModel: ObservableObject {
     @Published var showingLogoutConfirmation = false
     @Published var selectedSectionIndex = 0
     
-    @Published var favoriteOffers: [Offer] = []
-    @Published var ownedOffers: [Offer] = []
-    @Published var bookingHistory: [Offer] = []
+    @Published var favoriteOffers: [UnifiedPropertyModel] = []
+    @Published var ownedOffers: [UnifiedPropertyModel] = []
+    @Published var bookingHistory: [UnifiedPropertyModel] = []
     
     init() {
         loadOffers()
@@ -25,78 +25,93 @@ class ProfileViewModel: ObservableObject {
     
     private func loadOffers() {
         favoriteOffers = [
-            Offer(
-                title: "Cozy Studio Apartment",
-                address: "123 Main St, Bishkek",
-                price: 75000,
-                startDate: Date(),
-                endDate: Date().addingTimeInterval(86400 * 30),
-                bedsCount: 1,
-                area: 35.0,
-                maxOccupancy: 2,
-                isFavorited: true
-            ),
-            Offer(
-                title: "Luxury Penthouse",
-                address: "456 Park Ave, Bishkek",
-                price: 150000,
-                startDate: Date(),
-                endDate: Date().addingTimeInterval(86400 * 30),
-                bedsCount: 2,
-                area: 85.0,
-                maxOccupancy: 4,
-                isFavorited: true
-            )
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil)
         ]
         
         ownedOffers = [
-            Offer(
-                title: "My Mountain Cabin",
-                address: "789 Pine St, Karakol",
-                price: 95000,
-                startDate: Date(),
-                endDate: Date().addingTimeInterval(86400 * 30),
-                bedsCount: 3,
-                area: 110.0,
-                maxOccupancy: 6,
-                isOwner: true
-            ),
-            Offer(
-                title: "City Center Apartment",
-                address: "101 Oak Ave, Bishkek",
-                price: 80000,
-                startDate: Date(),
-                endDate: Date().addingTimeInterval(86400 * 30),
-                bedsCount: 2,
-                area: 65.0,
-                maxOccupancy: 3,
-                isOwner: true
-            )
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil)
         ]
         
         bookingHistory = [
-            Offer(
-                title: "Lake View Cottage",
-                address: "222 Shore Rd, Issyk-Kul",
-                price: 120000,
-                startDate: Date().addingTimeInterval(-86400 * 60),
-                endDate: Date().addingTimeInterval(-86400 * 30),
-                bedsCount: 2,
-                area: 70.0,
-                maxOccupancy: 4,
-                isOccupied: true
-            ),
-            Offer(
-                title: "Downtown Loft",
-                address: "333 Main St, Bishkek",
-                price: 85000,
-                startDate: Date().addingTimeInterval(-86400 * 120),
-                endDate: Date().addingTimeInterval(-86400 * 90),
-                bedsCount: 1,
-                area: 50.0,
-                maxOccupancy: 2,
-                isOccupied: true
-            )
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil)
         ]
     }
     

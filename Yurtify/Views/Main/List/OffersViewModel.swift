@@ -11,8 +11,8 @@ import SwiftUI
 
 @MainActor
 class OffersViewModel: ObservableObject {
-    @Published var offers: [Offer] = []
-    @Published var filteredOffers: [Offer] = []
+    @Published var offers: [UnifiedPropertyModel] = []
+    @Published var filteredOffers: [UnifiedPropertyModel] = []
     @Published var searchText: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
@@ -50,75 +50,65 @@ class OffersViewModel: ObservableObject {
         }
     }
     
-    private func createMockOffers() -> [Offer] {
+    private func createMockOffers() -> [UnifiedPropertyModel] {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
         return [
-            Offer(
-                title: "Современная квартира с видом на горы",
-                address: "Бишкек, ул. Ленина, 10",
-                price: 100000.0,
-                startDate: dateFormatter.date(from: "2025-07-01") ?? Date(),
-                endDate: dateFormatter.date(from: "2025-08-01") ?? Date(),
-                bedsCount: 2,
-                area: 60.0,
-                period: .perMonth,
-                maxOccupancy: 3,
-                coordinate: CLLocationCoordinate2D(latitude: 42.8746, longitude: 74.5698)
-            ),
-            Offer(
-                title: "Уютный гостевой домик",
-                address: "Кант, Комсомольский пр., 25",
-                price: 3500.0,
-                startDate: dateFormatter.date(from: "2025-07-15") ?? Date(),
-                endDate: dateFormatter.date(from: "2025-07-25") ?? Date(),
-                bedsCount: 1,
-                area: 45.0,
-                period: .perDay,
-                maxOccupancy: 2,
-                isOwner: false,
-                coordinate: CLLocationCoordinate2D(latitude: 42.8936, longitude: 74.8508)
-            ),
-            Offer(
-                title: "Люкс в Иссык-Куль Резорт",
-                address: "Чолпон-Ата, Набережная, 12",
-                price: 6000.0,
-                startDate: dateFormatter.date(from: "2025-08-01") ?? Date(),
-                endDate: dateFormatter.date(from: "2025-08-10") ?? Date(),
-                bedsCount: 2,
-                area: 75.0,
-                period: .perDay,
-                maxOccupancy: 4,
-                isOwner: false,
-                coordinate: CLLocationCoordinate2D(latitude: 42.6503, longitude: 77.0823)
-            ),
-            Offer(
-                title: "Моя квартира для сдачи",
-                address: "Бишкек, ул. Горького, 119",
-                price: 75000,
-                startDate: dateFormatter.date(from: "2025-07-01") ?? Date(),
-                endDate: dateFormatter.date(from: "2025-07-30") ?? Date(),
-                bedsCount: 3,
-                area: 65.0,
-                maxOccupancy: 4,
-                isOwner: true,
-                coordinate: CLLocationCoordinate2D(latitude: 42.8648, longitude: 74.5814),
-                isRented: true
-            ),
-            Offer(
-                title: "Курортный домик на берегу озера",
-                address: "Каракол, ул. Озерная, 5",
-                price: 4500.0,
-                startDate: dateFormatter.date(from: "2025-07-20") ?? Date(),
-                endDate: dateFormatter.date(from: "2025-08-05") ?? Date(),
-                bedsCount: 3,
-                area: 90.0,
-                period: .perDay,
-                maxOccupancy: 6,
-                isOwner: false,
-                coordinate: CLLocationCoordinate2D(latitude: 42.4907, longitude: 78.3936)
-            )
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5288),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(latitude: 42.87462, longitude: 74.5698),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil),
+            UnifiedPropertyModel(id: UUID().uuidString,
+                                 title: "Квартира",
+                                 addressName: "бишкек ",
+                                 coordinates: Coordinates(),
+                                 cost: 0,
+                                 period: .perMonth,
+                                 closedDates: [],
+                                 firstFreeDate: Date(),
+                                 firstClosedDate: nil)
         ]
     }
     
@@ -132,7 +122,7 @@ class OffersViewModel: ObservableObject {
         let lowercasedSearchTerm = searchTerm.lowercased()
         filteredOffers = offers.filter { offer in
             offer.title.lowercased().contains(lowercasedSearchTerm) ||
-                offer.address.lowercased().contains(lowercasedSearchTerm)
+                offer.addressName.lowercased().contains(lowercasedSearchTerm)
         }
     }
     
@@ -145,11 +135,11 @@ class OffersViewModel: ObservableObject {
     @MainActor
     func toggleFavorite(for offerId: String) {
         if let index = offers.firstIndex(where: { $0.id == offerId }) {
-            offers[index].isFavorited.toggle()
+            offers[index].isFavorite.toggle()
         }
         
         if let filteredIndex = filteredOffers.firstIndex(where: { $0.id == offerId }) {
-            filteredOffers[filteredIndex].isFavorited.toggle()
+            filteredOffers[filteredIndex].isFavorite.toggle()
         }
     }
 }

@@ -23,7 +23,6 @@ struct Offer: Identifiable, Equatable {
     let isOwner: Bool
     let coordinate: CLLocationCoordinate2D
     var isRented: Bool
-    var isOccupied: Bool
     var isFavorited: Bool
 
     init(
@@ -41,7 +40,6 @@ struct Offer: Identifiable, Equatable {
         isOwner: Bool = false,
         coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 42.8746, longitude: 74.5698),
         isRented: Bool = false,
-        isOccupied: Bool = false,
         isFavorited: Bool = false
     ) {
         self.id = id
@@ -58,7 +56,6 @@ struct Offer: Identifiable, Equatable {
         self.isOwner = isOwner
         self.coordinate = coordinate
         self.isRented = isRented
-        self.isOccupied = isOccupied
         self.isFavorited = isFavorited
     }
 
@@ -80,7 +77,6 @@ struct Offer: Identifiable, Equatable {
             lhs.coordinate.latitude == rhs.coordinate.latitude &&
             lhs.coordinate.longitude == rhs.coordinate.longitude &&
             lhs.isRented == rhs.isRented &&
-            lhs.isOccupied == rhs.isOccupied &&
             lhs.isFavorited == rhs.isFavorited
     }
 }

@@ -150,7 +150,7 @@ struct Address: Codable, Equatable {
     }
 }
 
-struct Coordinates: Codable, Equatable {
+struct Coordinates: Codable, Equatable, Hashable {
     var latitude: Double
     var longitude: Double
     

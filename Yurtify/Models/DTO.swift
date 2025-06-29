@@ -11,7 +11,7 @@ import SwiftUI
 
 // MARK: - Owner Model
 
-struct OwnerDto: Codable, Equatable {
+struct OwnerDto: Codable, Equatable, Hashable {
     var fullName: String
     var email: String
     var phone: String
@@ -32,7 +32,7 @@ struct OwnerDto: Codable, Equatable {
 
 // MARK: - Unified Property Model
 
-struct UnifiedPropertyModel: Identifiable, Codable {
+struct UnifiedPropertyModel: Identifiable, Codable, Hashable {
     var id: String
     var title: String
     var addressName: String
@@ -144,7 +144,6 @@ extension UnifiedPropertyModel {
             isOwner: isOwn,
             coordinate: coordinates.clLocation,
             isRented: false,
-            isOccupied: isOccupied,
             isFavorited: isFavorite
         )
     }

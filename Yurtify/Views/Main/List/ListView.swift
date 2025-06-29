@@ -9,10 +9,12 @@ import SwiftUI
 
 struct ListView: View {
     @StateObject private var viewModel = OffersViewModel()
-    @State private var selectedOffer: Offer?
+    @State private var selectedOffer: UnifiedPropertyModel?
      
+    @State private var navigationPath = NavigationPath()
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 SearchBar(
                     text: $viewModel.searchText,
@@ -49,9 +51,9 @@ struct ListView: View {
             .refreshable {
                 viewModel.refresh()
             }
-            .fullScreenCover(item: $selectedOffer) { offer in
-                OfferDetailView(offer: offer, onDismiss: {
-                    selectedOffer = nil
+            .navigationDestination(for: UnifiedPropertyModel.self) { offer in
+                OfferDetailView(property: offer, onDismiss: {
+                    navigationPath.removeLast()
                 })
             }
         }
@@ -89,15 +91,20 @@ struct ListView: View {
      
     private var offerListView: some View {
         ScrollView {
-            LazyVStack(spacing: 24) {
+            LazyVStack(spacing: 16) {
                 ForEach(viewModel.filteredOffers) { offer in
-                    OfferView(offer: offer)
-                        .onTapGesture {
-                            selectedOffer = offer
-                        }
+                    Button(action: {
+                        navigationPath.append(offer)
+                    }) {
+                        OfferView(property: offer)
+                            .background(Color.app.base)
+                            .cornerRadius(12)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
-            .padding(.vertical, 16)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
         }
     }
 }
