@@ -6,18 +6,6 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
-		<key>NSAllowsArbitraryLoadsForMedia</key>
-		<true/>
-		<key>NSAllowsArbitraryLoadsUsageDescription</key>
-		<dict>
-			<key>77.110.105.134</key>
-			<dict/>
-		</dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>77.110.105.134</key>
-			<string></string>
-		</dict>
 	</dict>
 	<key>UIAppFonts</key>
 	<array>

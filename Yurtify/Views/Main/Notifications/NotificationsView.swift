@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NotificationsView: View {
     @StateObject private var viewModel = NotificationsViewModel()
-    
+    @EnvironmentObject var apiService: APIService
     var body: some View {
         NavigationStack {
             List {
@@ -48,6 +48,9 @@ struct NotificationsView: View {
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.app.base)
                 }
+            }
+            .onAppear{
+                viewModel.setAPIService(apiService)
             }
             .listStyle(PlainListStyle())
             .scrollContentBackground(.hidden)

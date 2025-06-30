@@ -35,7 +35,8 @@ class RegistrationViewModel: ObservableObject {
         password.count >= 8 &&
             password.rangeOfCharacter(from: .uppercaseLetters) != nil &&
             password.rangeOfCharacter(from: .lowercaseLetters) != nil &&
-            password.rangeOfCharacter(from: .decimalDigits) != nil
+            password.rangeOfCharacter(from: .decimalDigits) != nil &&
+        hasSpecialCharacter(password)
     }
     
     var doPasswordsMatch: Bool {
@@ -54,56 +55,100 @@ class RegistrationViewModel: ObservableObject {
     }
     
     // MARK: - Validation Methods
-    
+   
+    private func hasSpecialCharacter(_ password: String) -> Bool {
+        let specialCharacters = CharacterSet(charactersIn: "!@#$%^&*()_+-=[]{}|;':\",./<>?")
+        return password.rangeOfCharacter(from: specialCharacters) != nil
+    }
+
     func validateForm() -> String? {
-        if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedSurname = surname.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPhoneNumber = phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        print("🔍 Registration Validation Debug:")
+        print("   Name: '\(name)' -> '\(trimmedName)' (length: \(trimmedName.count))")
+        print("   Surname: '\(surname)' -> '\(trimmedSurname)' (length: \(trimmedSurname.count))")
+        print("   Phone: '\(phoneNumber)' -> '\(trimmedPhoneNumber)' (length: \(trimmedPhoneNumber.count))")
+        print("   Email: '\(email)' (length: \(email.count))")
+        print("   Password: '\(password)' (length: \(password.count))")
+        print("   Confirmation: '\(confirmation)' (length: \(confirmation.count))")
+        print("   isEmailValid: \(isEmailValid)")
+        print("   isPasswordValid: \(isPasswordValid)")
+        print("   doPasswordsMatch: \(doPasswordsMatch)")
+        print("   isFormValid: \(isFormValid)")
+        
+        if trimmedName.isEmpty {
+            print("❌ Name validation failed")
             return "First name is required"
         }
+        if !hasSpecialCharacter(password) {
+            print("❌ Password special character validation failed")
+            return "Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;':\",./<>?)"
+        }
+        if password.rangeOfCharacter(from: .decimalDigits) == nil {
+            print("❌ Password digit validation failed")
+            return "Password must contain at least one number"
+        }
         
-        if surname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if trimmedSurname.isEmpty {
+            print("❌ Surname validation failed")
             return "Last name is required"
         }
         
-        if phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if trimmedPhoneNumber.isEmpty {
+            print("❌ Phone number validation failed")
             return "Phone number is required"
         }
         
         if email.isEmpty {
+            print("❌ Email empty validation failed")
             return "Email is required"
         }
         
         if !isEmailValid {
+            print("❌ Email format validation failed")
             return "Please enter a valid email address"
         }
         
         if password.isEmpty {
+            print("❌ Password empty validation failed")
             return "Password is required"
         }
         
         if password.count < 8 {
+            print("❌ Password length validation failed: \(password.count)")
             return "Password must be at least 8 characters"
         }
         
         if password.rangeOfCharacter(from: .uppercaseLetters) == nil {
+            print("❌ Password uppercase validation failed")
             return "Password must contain at least one uppercase letter"
         }
         
         if password.rangeOfCharacter(from: .lowercaseLetters) == nil {
+            print("❌ Password lowercase validation failed")
             return "Password must contain at least one lowercase letter"
         }
         
         if password.rangeOfCharacter(from: .decimalDigits) == nil {
+            print("❌ Password digit validation failed")
             return "Password must contain at least one number"
         }
         
         if confirmation.isEmpty {
+            print("❌ Confirmation empty validation failed")
             return "Please confirm your password"
         }
         
         if password != confirmation {
+            print("❌ Password match validation failed")
+            print("   Password: '\(password)'")
+            print("   Confirmation: '\(confirmation)'")
             return "Passwords do not match"
         }
         
+        print("✅ Registration validation passed")
         return nil
     }
     
@@ -112,7 +157,15 @@ class RegistrationViewModel: ObservableObject {
     func register(authManager: AuthManager) {
         guard !isLoading else { return }
         
+        print("🚀 Registration attempt started")
+        print("   Name: '\(name)'")
+        print("   Surname: '\(surname)'")
+        print("   Phone: '\(phoneNumber)'")
+        print("   Email: '\(email)'")
+        print("   Password length: \(password.count)")
+        
         if let validationError = validateForm() {
+            print("❌ Registration validation failed: \(validationError)")
             errorMessage = validationError
             return
         }
@@ -131,13 +184,18 @@ class RegistrationViewModel: ObservableObject {
                     password: password
                 )
                 
+                print("📡 Calling authManager.register...")
+                print("   Registration data: \(registrationData)")
+                
                 try await authManager.register(data: registrationData)
                 
+                print("✅ Registration successful")
                 await MainActor.run {
                     isLoading = false
                 }
                 
             } catch {
+                print("❌ Registration failed: \(error)")
                 await MainActor.run {
                     isLoading = false
                     errorMessage = error.localizedDescription

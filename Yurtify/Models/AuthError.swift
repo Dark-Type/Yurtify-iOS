@@ -16,6 +16,7 @@ enum AuthError: Error, LocalizedError {
     case refreshTokenExpired
     case networkError
     case storageError
+    case userAlreadyExists
     case loginInProgress
 
     var errorDescription: String? {
@@ -38,6 +39,8 @@ enum AuthError: Error, LocalizedError {
             return "Failed to save user data. Please try again"
         case .loginInProgress:
             return "Login already in progress"
+        case .userAlreadyExists:
+            return "User with this phone number already exists"
         }
     }
 }

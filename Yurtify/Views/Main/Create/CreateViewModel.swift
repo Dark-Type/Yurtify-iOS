@@ -17,6 +17,7 @@ final class CreateViewModel: ObservableObject {
     @Published var priceText = ""
     @Published var areaText = ""
     
+    private var apiService: APIService!
     @Published var startDate = Date()
     @Published var endDate = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
     @Published var unavailableDates = Set<Date>()
@@ -52,8 +53,6 @@ final class CreateViewModel: ObservableObject {
         set { property.bedsCount = Int(newValue) }
     }
     
-   
-    
     var capacity: Double {
         get { Double(property.maxPeople) }
         set { property.maxPeople = Int(newValue) }
@@ -81,7 +80,12 @@ final class CreateViewModel: ObservableObject {
         property.firstClosedDate = endDate
         areaText = "0"
     }
-    
+
+    func setAPIService(_ apiService: APIService) {
+        self.apiService = apiService
+       
+    }
+
     // MARK: - Form Validation
 
     func validateForm() -> Bool {
@@ -105,7 +109,7 @@ final class CreateViewModel: ObservableObject {
             invalidFields.insert(.measurements)
         }
         
-        if property.placeAmount <= 0 || property.bedsCount <= 0 ||  property.maxPeople <= 0 {
+        if property.placeAmount <= 0 || property.bedsCount <= 0 || property.maxPeople <= 0 {
             invalidFields.insert(.measurements)
         }
         
@@ -252,15 +256,13 @@ final class CreateViewModel: ObservableObject {
             
             for (index, item) in selectedPhotoItems.enumerated() {
                 do {
-                    
                     if let data = try await item.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data) {
+                       let uiImage = UIImage(data: data)
+                    {
                         let propertyImage = PropertyImage(image: uiImage)
                         loadedImages.append(propertyImage)
-                    } else {
-                    }
-                } catch {
-                }
+                    } else {}
+                } catch {}
             }
             
             await MainActor.run {
@@ -274,7 +276,73 @@ final class CreateViewModel: ObservableObject {
             }
         }
     }
+
+    func uploadImage(_ image: UIImage, filename: String) async throws -> String? {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            throw APIError.networkError(NSError(domain: "Failed to convert image to data", code: -1))
+        }
+        let response = try await apiService.uploadImage(
+            imageData: imageData,
+            filename: filename
+        )
+        return response.imageId
+    }
     
+    func createPropertyAsync() async -> (success: Bool, message: String) {
+        property.createdAt = Date()
+        property.updatedAt = Date()
+        property.isOwn = true
+
+        if let posterImage = posterImage {
+            do {
+                if let uploadedId = try await uploadImage(posterImage.image, filename: "poster_\(property.id).jpg") {
+                    property.posterUrl = uploadedId
+                }
+            } catch {
+                return (false, "Failed to upload poster image: \(error.localizedDescription)")
+            }
+        }
+
+       
+        var uploadedGalleryIds: [String] = []
+        for (index, propertyImage) in selectedImages.enumerated() {
+            do {
+                if let uploadedId = try await uploadImage(propertyImage.image, filename: "gallery_\(property.id)_\(index).jpg") {
+                    uploadedGalleryIds.append(uploadedId)
+                }
+            } catch {
+                return (false, "Failed to upload image #\(index + 1): \(error.localizedDescription)")
+            }
+        }
+        property.galleryUrls = uploadedGalleryIds
+
+      
+        property.owner = OwnerDto(
+            fullName: "Current User",
+            email: "user@example.com",
+            phone: "+996 XXX XXX XXX",
+            imageUrl: ""
+        )
+
+        logPropertyData()
+
+        
+        let dto = property.toHousingCreateDTO()
+        do {
+            _ = try await apiService.createHousing(request: dto)
+            return (true, "Property created successfully!")
+        } catch {
+            return (false, "Failed to create property: \(error.localizedDescription)")
+        }
+    }
+
+    func createProperty(completion: @escaping (Bool, String) -> Void) {
+        Task {
+            let result = await createPropertyAsync()
+            completion(result.success, result.message)
+        }
+    }
+
     func addCameraImage(_ image: UIImage) {
         print("📷 Adding camera image")
         let propertyImage = PropertyImage(image: image)
@@ -283,7 +351,6 @@ final class CreateViewModel: ObservableObject {
         if posterImage == nil {
             posterImage = propertyImage
         }
-        
     }
     
     func removeImage(at index: Int) {
@@ -297,7 +364,6 @@ final class CreateViewModel: ObservableObject {
         if posterImage?.id == imageToRemove.id {
             posterImage = nil
         }
-        
     }
     
     // MARK: - Mock Image Upload
@@ -324,41 +390,6 @@ final class CreateViewModel: ObservableObject {
         
         let mockUrl = "https://mock-storage.com/properties/\(property.id)/poster.jpg"
         return mockUrl
-    }
-    
-    // MARK: - Property Creation
-    
-    func createPropertyAsync() async -> (success: Bool, message: String) {
-        property.createdAt = Date()
-        property.updatedAt = Date()
-        property.isOwn = true
-        
-        if let posterUrl = await uploadPosterImage() {
-            property.posterUrl = posterUrl
-        }
-        
-        let uploadedUrls = await uploadImages()
-        property.galleryUrls = uploadedUrls
-        
-        property.owner = OwnerDto(
-            fullName: "Current User",
-            email: "user@example.com",
-            phone: "+996 XXX XXX XXX",
-            imageUrl: "https://mock-storage.com/users/current/avatar.jpg"
-        )
-        
-        logPropertyData()
-        
-        try? await Task.sleep(for: .seconds(1.5))
-        
-        return (true, "Property created successfully!")
-    }
-    
-    func createProperty(completion: @escaping (Bool, String) -> Void) {
-        Task {
-            let result = await createPropertyAsync()
-            completion(result.success, result.message)
-        }
     }
     
     // MARK: - Helper Methods

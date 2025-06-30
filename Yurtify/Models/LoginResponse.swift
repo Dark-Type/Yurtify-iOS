@@ -5,7 +5,7 @@
 //  Created by dark type on 15.06.2025.
 //
 
-struct LoginResponse {
+struct LoginResponse: Codable {
     let id: String
     let name: String
     let surname: String

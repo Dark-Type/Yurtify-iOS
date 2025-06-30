@@ -17,6 +17,7 @@ struct CreateView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var isShowingSuccessView = false
+    @EnvironmentObject var apiService: APIService
     
     enum FormField: Hashable {
         case name
@@ -57,6 +58,9 @@ struct CreateView: View {
         .onTapGesture {
             focusedField = nil
         }
+        .onAppear {
+            viewModel.setAPIService(apiService)
+        }
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Message"),
@@ -64,6 +68,7 @@ struct CreateView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        
         .photosPicker(
             isPresented: $viewModel.showingImagePicker,
             selection: $viewModel.selectedPhotoItems,

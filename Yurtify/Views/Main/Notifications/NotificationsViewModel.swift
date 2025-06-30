@@ -33,7 +33,12 @@ struct NotificationItem: Identifiable {
 
 class NotificationsViewModel: ObservableObject {
     @Published var notifications: [NotificationItem] = []
+    private var apiService: APIService!
     
+    func setAPIService(_ apiService: APIService) {
+        self.apiService = apiService
+    }
+
     init() {
         loadMockData()
     }

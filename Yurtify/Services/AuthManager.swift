@@ -4,9 +4,8 @@
 //
 //  Created by dark type on 14.06.2025.
 //
-
 import Combine
-import SwiftUI
+import Foundation
 
 @MainActor
 final class AuthManager: ObservableObject {
@@ -17,17 +16,21 @@ final class AuthManager: ObservableObject {
     
     private let userDefaultsService = UserDefaultsService()
     private let keychainService = KeychainService()
-    private let authAPIService = AuthAPIService()
-    private let tokenManager = TokenManager(keychainService: KeychainService())
+    private let apiService: APIService
+    private let tokenManager: TokenManager
     
     private var cancellables = Set<AnyCancellable>()
     private var tokenValidationTask: Task<Void, Never>?
     
-    init() {
+    init(apiService: APIService) {
+        self.apiService = apiService
+        self.tokenManager = TokenManager(keychainService: keychainService, apiService: apiService)
+        
         Task {
             await initializeAuth()
         }
     }
+    
     
     // MARK: - Initial Setup
     
@@ -51,35 +54,8 @@ final class AuthManager: ObservableObject {
             }
             
             isInitializing = false
-            
             startTokenMonitoring()
         }
-    }
-    
-    private func validateInitialTokens(for userData: User) async {
-        do {
-            let updatedUser = try await tokenManager.validateTokens(for: userData)
-            await MainActor.run {
-                if updatedUser != userData {
-                    currentUser = updatedUser
-                }
-            }
-        } catch {
-            await MainActor.run {
-                logout()
-            }
-        }
-    }
-    
-    private func startTokenMonitoring() {
-        Timer.publish(every: 300, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                Task {
-                    await self?.validateCurrentTokens()
-                }
-            }
-            .store(in: &cancellables)
     }
     
     // MARK: - Authentication Actions
@@ -95,12 +71,24 @@ final class AuthManager: ObservableObject {
         isLoading = true
         
         do {
-            let loginResponse = try await authAPIService.login(
+            let (accessToken, refreshToken) = try await apiService.login(
                 phoneNumber: phoneNumber,
                 password: password
             )
             
-            let user = User(from: loginResponse, password: password)
+            let user = User(
+                id: UUID().uuidString, // Temporary ID
+                name: "User", // Default name
+                surname: "",
+                patronymic: nil,
+                phoneNumber: phoneNumber,
+                email: "", // Default - fetch from profile if needed
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                accessTokenExpiresAt: Date().addingTimeInterval(15 * 60),
+                refreshTokenExpiresAt: Date().addingTimeInterval(24 * 60 * 60),
+                password: password
+            )
             
             try keychainService.storeUser(user)
             userDefaultsService.setShouldBeAuthenticated(true)
@@ -109,7 +97,6 @@ final class AuthManager: ObservableObject {
                 currentUser = user
                 isAuthenticated = true
                 isLoading = false
-                
                 objectWillChange.send()
             }
             
@@ -125,9 +112,22 @@ final class AuthManager: ObservableObject {
         isLoading = true
         
         do {
-            let registerResponse = try await authAPIService.register(data: data)
+            let (accessToken, refreshToken) = try await apiService.register(data: data)
             
-            let user = User(from: registerResponse, password: data.password)
+            
+            let user = User(
+                id: UUID().uuidString, // Generate a temporary ID
+                name: data.name,
+                surname: data.surname,
+                patronymic: data.patronymic,
+                phoneNumber: data.phoneNumber,
+                email: data.email,
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                accessTokenExpiresAt: Date().addingTimeInterval(15 * 60), // 15 minutes default
+                refreshTokenExpiresAt: Date().addingTimeInterval(24 * 60 * 60), // 24 hours default
+                password: data.password
+            )
             
             try keychainService.storeUser(user)
             userDefaultsService.setShouldBeAuthenticated(true)
@@ -170,6 +170,32 @@ final class AuthManager: ObservableObject {
     }
     
     // MARK: - Token Management
+    
+    private func validateInitialTokens(for userData: User) async {
+        do {
+            let updatedUser = try await tokenManager.validateTokens(for: userData)
+            await MainActor.run {
+                if updatedUser != userData {
+                    currentUser = updatedUser
+                }
+            }
+        } catch {
+            await MainActor.run {
+                logout()
+            }
+        }
+    }
+    
+    private func startTokenMonitoring() {
+        Timer.publish(every: 300, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                Task {
+                    await self?.validateCurrentTokens()
+                }
+            }
+            .store(in: &cancellables)
+    }
     
     private func validateCurrentTokens() async {
         guard let user = currentUser, isAuthenticated else { return }

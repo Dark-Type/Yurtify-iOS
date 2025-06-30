@@ -9,10 +9,11 @@ import Foundation
 
 final class TokenManager: Sendable {
     private let keychainService: KeychainService
-    private let authAPIService = AuthAPIService()
+    private let apiService: APIService
     
-    init(keychainService: KeychainService) {
+    init(keychainService: KeychainService, apiService: APIService) {
         self.keychainService = keychainService
+        self.apiService = apiService
     }
     
     func validateTokens(for user: User) async throws -> User {
@@ -31,7 +32,7 @@ final class TokenManager: Sendable {
     
     private func refreshAccessToken(for user: User) async throws -> User {
         do {
-            let refreshResponse = try await authAPIService.refreshToken(refreshToken: user.refreshToken)
+            let newAccessToken = try await apiService.refreshTokens(refreshToken: user.refreshToken)
             
             let updatedUser = User(
                 id: user.id,
@@ -40,19 +41,15 @@ final class TokenManager: Sendable {
                 patronymic: user.patronymic,
                 phoneNumber: user.phoneNumber,
                 email: user.email,
-                accessToken: refreshResponse.accessToken,
+                accessToken: newAccessToken,
                 refreshToken: user.refreshToken,
-                accessTokenExpiresAt: Date().addingTimeInterval(TimeInterval(refreshResponse.expiresIn)),
+                accessTokenExpiresAt: Date().addingTimeInterval(15 * 60),
                 refreshTokenExpiresAt: user.refreshTokenExpiresAt,
                 password: user.password
             )
             
-            do {
-                try keychainService.storeUser(updatedUser)
-                return updatedUser
-            } catch {
-                throw AuthError.storageError
-            }
+            try keychainService.storeUser(updatedUser)
+            return updatedUser
             
         } catch {
             throw error

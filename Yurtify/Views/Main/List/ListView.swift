@@ -10,7 +10,8 @@ import SwiftUI
 struct ListView: View {
     @StateObject private var viewModel = OffersViewModel()
     @State private var selectedOffer: UnifiedPropertyModel?
-     
+    @EnvironmentObject var apiService: APIService
+    @EnvironmentObject var authManager: AuthManager
     @State private var navigationPath = NavigationPath()
 
     var body: some View {
@@ -24,12 +25,29 @@ struct ListView: View {
                 )
                  
                 if !viewModel.isLoading {
-                    Text("\(viewModel.filteredOffers.count) \(L10n.Detail.similarOffers)")
-                        .font(.app.footnote())
-                        .foregroundColor(.app.textFade)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 10)
+                    HStack {
+                        if viewModel.isSearching {
+                            Text("🔍 \(viewModel.filteredOffers.count) результатов поиска")
+                                .font(.app.footnote())
+                                .foregroundColor(.app.primaryVariant)
+                        } else {
+                            Text("\(viewModel.filteredOffers.count) \(L10n.Detail.similarOffers)")
+                                .font(.app.footnote())
+                                .foregroundColor(.app.textFade)
+                        }
+                        
+                        Spacer()
+                        
+                        if viewModel.isSearching && !viewModel.searchText.isEmpty {
+                            Text("для '\(viewModel.searchText)'")
+                                .font(.app.caption1())
+                                .foregroundColor(.app.textFade)
+                                .italic()
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
                 }
                  
                 ZStack {
@@ -57,6 +75,10 @@ struct ListView: View {
                 })
             }
         }
+        .onAppear {
+            viewModel.setAPIService(apiService)
+        }
+        .environmentObject(apiService)
     }
      
     private var loadingView: some View {
@@ -92,15 +114,20 @@ struct ListView: View {
     private var offerListView: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
-                ForEach(viewModel.filteredOffers) { offer in
+                ForEach(viewModel.filteredOffers) { property in
                     Button(action: {
-                        navigationPath.append(offer)
+                        navigationPath.append(property)
                     }) {
-                        OfferView(property: offer)
+                        OfferView(property: property)
+                            .environmentObject(apiService)
+                            .environmentObject(authManager)
                             .background(Color.app.base)
                             .cornerRadius(12)
                     }
                     .buttonStyle(PlainButtonStyle())
+                    .onAppear {
+                        viewModel.loadMoreOffersIfNeeded(currentOffer: property)
+                    }
                 }
             }
             .padding(.horizontal, 16)

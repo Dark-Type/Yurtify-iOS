@@ -16,10 +16,7 @@ struct MapView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
     )
     @StateObject private var locationManager = LocationManager()
-    
-    @State private var isProcessingSelection = false
-    @State private var lastSelectionTime = Date.distantPast
-    
+    @EnvironmentObject var apiService: APIService
     @State private var navigationPath = NavigationPath()
 
     var body: some View {
@@ -34,12 +31,10 @@ struct MapView: View {
                     }
                 )
                 .edgesIgnoringSafeArea(.all)
-                
+
                 GeometryReader { geometry in
                     VStack(spacing: 0) {
-                        Spacer()
-                            .frame(height: geometry.safeAreaInsets.top)
-                        
+                        Spacer().frame(height: geometry.safeAreaInsets.top)
                         SearchBar(
                             text: $viewModel.searchText,
                             placeholder: "\(L10n.search) \(L10n.Detail.address)",
@@ -50,15 +45,13 @@ struct MapView: View {
                         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 2)
                     }
                 }
-                
+
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
                         Button {
-                            Task {
-                                await requestUserLocation()
-                            }
+                            Task { await requestUserLocation() }
                         } label: {
                             Image(systemName: "location.fill")
                                 .foregroundColor(.app.primaryVariant)
@@ -75,25 +68,24 @@ struct MapView: View {
                     navigationPath.removeLast()
                 })
             }
+            .refreshable {
+                viewModel.refresh()
+            }
+            .onAppear {
+                viewModel.setAPIService(apiService)
+            }
         }
+        .environmentObject(apiService)
     }
-    
+
     private func handleOfferSelection(_ offerId: String) {
         if let offer = viewModel.filteredOffers.first(where: { $0.id == offerId }) {
             navigationPath.append(offer)
         }
     }
 
-    private func formatPrice(_ price: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: price)) ?? "\(price)"
-    }
-    
     private func requestUserLocation() async {
         let authStatus = await locationManager.requestLocationPermission()
-        
         if authStatus == .authorizedWhenInUse || authStatus == .authorizedAlways {
             if let userLocation = locationManager.currentLocation {
                 await MainActor.run {
@@ -104,15 +96,12 @@ struct MapView: View {
                 }
             } else {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
-                
                 await MainActor.run {
                     if let userLocation = locationManager.currentLocation {
                         region = MKCoordinateRegion(
                             center: userLocation.coordinate,
                             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                         )
-                    } else {
-                        print("Could not get user location")
                     }
                 }
             }

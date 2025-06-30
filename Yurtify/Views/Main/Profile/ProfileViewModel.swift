@@ -27,7 +27,7 @@ class ProfileViewModel: ObservableObject, Sendable {
     
     // MARK: - API Service
 
-    nonisolated let apiService = APIService()
+    private var apiService: APIService?
     
     @Published var showingCamera = false
     @Published var selectedPhotoItem: PhotosPickerItem?
@@ -40,7 +40,11 @@ class ProfileViewModel: ObservableObject, Sendable {
     init() {
         loadOffers()
     }
-    
+
+    func setAPIService(_ apiService: APIService) {
+        self.apiService = apiService
+    }
+
     private func loadOffers() {
         favoriteOffers = [
             UnifiedPropertyModel(id: UUID().uuidString,
@@ -159,7 +163,7 @@ class ProfileViewModel: ObservableObject, Sendable {
                         self.selectedPhotoItem = nil
                     }
                     
-                     uploadProfileImage(image)
+                    uploadProfileImage(image)
                 }
             } catch {
                 await MainActor.run {
@@ -179,28 +183,32 @@ class ProfileViewModel: ObservableObject, Sendable {
     }
     
     func uploadProfileImage(_ image: UIImage) {
-        testHTTPConnection()
+        guard let apiService = apiService else {
+            uploadError = "API Service not available"
+            return
+        }
+           
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             uploadError = "Failed to convert image to data"
             return
         }
-        
+           
         isUploadingImage = true
         uploadError = nil
-        
+           
         Task {
             do {
                 let response = try await apiService.uploadImage(
                     imageData: imageData,
                     filename: "profile_image.jpg"
                 )
-                
+                   
                 await MainActor.run {
                     self.uploadedImageId = response.imageId
                     self.isUploadingImage = false
-                    print("Image uploaded successfully with ID: \(response.imageId ?? "dunno")")
+                    print("Image uploaded successfully with ID: \(String(describing: response.imageId))")
                 }
-                
+                   
             } catch {
                 await MainActor.run {
                     self.uploadError = error.localizedDescription
@@ -210,6 +218,7 @@ class ProfileViewModel: ObservableObject, Sendable {
             }
         }
     }
+
     func testHTTPConnection() {
         Task {
             do {

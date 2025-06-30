@@ -11,7 +11,8 @@ import SwiftUI
 struct OfferDetailView: View {
     @StateObject private var viewModel: OfferDetailViewModel
     @State private var selectedImageIndex: Int = 0
-    
+    @EnvironmentObject var apiService: APIService
+    @EnvironmentObject var authManager: AuthManager
     let onDismiss: () -> Void
 
     init(property: UnifiedPropertyModel, onDismiss: @escaping () -> Void) {
@@ -23,15 +24,15 @@ struct OfferDetailView: View {
         GeometryReader { geometry in
             ZStack {
                 Color.app.base.ignoresSafeArea()
-                
+                   
                 ScrollView {
                     VStack(spacing: 0) {
                         headerImageSection(geometry: geometry)
-                        
+                           
                         VStack(spacing: 20) {
                             titleSection
                             sectionTabsView
-                            
+                               
                             if viewModel.selectedSectionIndex == 0 {
                                 descriptionSection
                             } else if viewModel.selectedSectionIndex == 1 {
@@ -46,7 +47,7 @@ struct OfferDetailView: View {
                     }
                 }
                 .edgesIgnoringSafeArea(.top)
-                
+                   
                 VStack {
                     HStack {
                         Button(action: onDismiss) {
@@ -57,9 +58,9 @@ struct OfferDetailView: View {
                                 .fill(Color.white.opacity(0.9))
                                 .frame(width: 40, height: 40)
                         )
-                        
+                           
                         Spacer()
-                        
+                           
                         HStack(spacing: 16) {
                             Button(action: viewModel.shareProperty) {
                                 Image.appIcon(.shareButton)
@@ -69,7 +70,7 @@ struct OfferDetailView: View {
                                     .fill(Color.white.opacity(0.9))
                                     .frame(width: 40, height: 40)
                             )
-                            
+                               
                             Button(action: viewModel.toggleFavorite) {
                                 Image.appIcon(viewModel.isFavorite ? .favoriteButtonSelected : .favoriteButtonUnselected)
                             }
@@ -82,26 +83,38 @@ struct OfferDetailView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, geometry.safeAreaInsets.top + 16)
-                    
+                       
                     Spacer()
                 }
+                   
                 if !(viewModel.property?.isOwn ?? true) {
                     VStack {
                         Spacer()
                         bottomActionBar
                     }
                 }
-                
+                   
                 if viewModel.isRentSuccessful {
                     rentSuccessOverlay
                 }
             }
             .navigationBarHidden(true)
+            .onAppear {
+                viewModel.setDependencies(apiService: apiService, authManager: authManager)
+            }
             .sheet(isPresented: $viewModel.showingBookingSheet) {
                 BookingDateSheet(
                     viewModel: viewModel,
                     isPresented: $viewModel.showingBookingSheet
                 )
+            }
+            .alert("Authentication Required", isPresented: $viewModel.showingAuthAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Sign In") {
+                    onDismiss()
+                }
+            } message: {
+                Text("Please sign in to add favorites or make bookings.")
             }
         }
     }
@@ -110,25 +123,32 @@ struct OfferDetailView: View {
     
     private func headerImageSection(geometry: GeometryProxy) -> some View {
         ZStack {
-            if let property = viewModel.property, !property.posterUrl.isEmpty {
-                AsyncImage(url: URL(string: property.posterUrl)) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Color.gray.opacity(0.3)
-                }
-                .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
-                .clipped()
+            if let property = viewModel.property,
+               let firstImageId = property.galleryUrls.first,
+               !firstImageId.isEmpty
+            {
+                AsyncImageView(imageId: firstImageId)
+                    .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
+                    .clipped()
             } else {
-                ZStack {
-                    Color.gray.opacity(0.3)
-                        .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
-                    
-                    Image(systemName: "photo.fill")
-                        .font(.system(size: 120))
-                        .foregroundColor(.gray)
-                }
+                placeholderHeaderImage
+                    .frame(width: geometry.size.width, height: geometry.size.height * 0.4)
+            }
+        }
+    }
+    
+    private var placeholderHeaderImage: some View {
+        ZStack {
+            Color.gray.opacity(0.3)
+            
+            VStack(spacing: 8) {
+                Image(systemName: "photo.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(.gray)
+                
+                Text("Фото недоступно")
+                    .font(.caption)
+                    .foregroundColor(.gray)
             }
         }
     }
@@ -322,56 +342,57 @@ struct OfferDetailView: View {
     // MARK: - Gallery Section
     
     private var gallerySection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text(L10n.Detail.gallery)
-                .font(.app.headline())
-                .foregroundColor(.app.textPrimary)
-                .padding(.horizontal)
-            
-            if viewModel.isLoadingImages {
-                VStack {
-                    ProgressView()
-                    Text("Loading images...")
-                        .font(.app.caption1())
-                        .foregroundColor(.app.textFade)
-                        .padding(.top, 8)
-                }
-                .frame(height: 200)
-            } else if viewModel.galleryImages.isEmpty {
-                VStack {
-                    Image(systemName: "photo.badge.plus")
-                        .font(.system(size: 60))
-                        .foregroundColor(.gray)
-                    Text("No images available")
-                        .font(.app.caption1())
-                        .foregroundColor(.app.textFade)
-                }
-                .frame(height: 200)
-            } else {
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(), spacing: 8),
-                        GridItem(.flexible(), spacing: 8)
-                    ],
-                    spacing: 12
-                ) {
-                    ForEach(0..<viewModel.galleryImages.count, id: \.self) { index in
-                        Image(uiImage: viewModel.galleryImages[index])
-                            .resizable()
-                            .aspectRatio(1, contentMode: .fill)
-                            .frame(maxWidth: .infinity)
-                            .clipped()
-                            .cornerRadius(12)
-                            .onTapGesture {
-                                selectedImageIndex = index
-                                // TODO: Open full screen image viewer
-                            }
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
+          VStack(alignment: .leading, spacing: 16) {
+              Text(L10n.Detail.gallery)
+                  .font(.app.headline())
+                  .foregroundColor(.app.textPrimary)
+                  .padding(.horizontal)
+              
+              if viewModel.isLoadingImages {
+                  VStack {
+                      ProgressView()
+                          .progressViewStyle(CircularProgressViewStyle(tint: .app.primaryVariant))
+                      Text("Loading images...")
+                          .font(.app.caption1())
+                          .foregroundColor(.app.textFade)
+                          .padding(.top, 8)
+                  }
+                  .frame(height: 200)
+              } else if viewModel.galleryImages.isEmpty {
+                  VStack(spacing: 12) {
+                      Image(systemName: "photo.badge.plus")
+                          .font(.system(size: 40))
+                          .foregroundColor(.gray)
+                      Text("No images available")
+                          .font(.app.caption1())
+                          .foregroundColor(.app.textFade)
+                  }
+                  .frame(height: 200)
+              } else {
+                  LazyVGrid(
+                      columns: [
+                          GridItem(.flexible(), spacing: 8),
+                          GridItem(.flexible(), spacing: 8)
+                      ],
+                      spacing: 12
+                  ) {
+                      ForEach(0..<viewModel.galleryImages.count, id: \.self) { index in
+                          Image(uiImage: viewModel.galleryImages[index])
+                              .resizable()
+                              .aspectRatio(1, contentMode: .fill)
+                              .frame(maxWidth: .infinity)
+                              .clipped()
+                              .cornerRadius(12)
+                              .onTapGesture {
+                                  selectedImageIndex = index
+                                  // TODO: Open full screen image viewer
+                              }
+                      }
+                  }
+                  .padding(.horizontal)
+              }
+          }
+      }
     
     // MARK: - Similar Section
     
@@ -496,14 +517,12 @@ extension L10n.Measures.Price {
                                            firstFreeDate: Date(),
                                            firstClosedDate: nil,
                                            owner: OwnerDto(
-                                            fullName: "John Doe\nSmith",
-                                            email: "john.doe@example.com",
-                                            phone: "+996 555 123 456",
-                                            imageUrl: "https://example.com/avatar.jpg"
-                                           )
-                                          ),
+                                               fullName: "John Doe\nSmith",
+                                               email: "john.doe@example.com",
+                                               phone: "+996 555 123 456",
+                                               imageUrl: "https://example.com/avatar.jpg"
+                                           )),
                                             
-            
             onDismiss: {}
         )
     }

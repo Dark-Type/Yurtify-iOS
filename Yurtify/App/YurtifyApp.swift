@@ -9,13 +9,19 @@ import SwiftUI
 
 @main
 struct YurtifyApp: App {
-    @StateObject private var authManager = AuthManager()
+    private let apiService = APIService()
+    @StateObject private var authManager: AuthManager
+
+    init() {
+        let apiService = APIService()
+        self._authManager = StateObject(wrappedValue: AuthManager(apiService: apiService))
+    }
 
     var body: some Scene {
         WindowGroup {
             RootNavigationView()
                 .environmentObject(authManager)
-                .onAppear {}
+                .environmentObject(apiService)
         }
     }
 }

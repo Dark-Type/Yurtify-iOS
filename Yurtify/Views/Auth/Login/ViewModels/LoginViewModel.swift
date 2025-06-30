@@ -5,6 +5,7 @@
 //  Created by dark type on 15.06.2025.
 //
 import Combine
+import Foundation
 
 @MainActor
 class LoginViewModel: ObservableObject {
@@ -19,11 +20,17 @@ class LoginViewModel: ObservableObject {
     
     var isPasswordValid: Bool {
         password.count >= 8 &&
-        password.rangeOfCharacter(from: .uppercaseLetters) != nil &&
-        password.rangeOfCharacter(from: .lowercaseLetters) != nil &&
-        password.rangeOfCharacter(from: .decimalDigits) != nil
+            password.rangeOfCharacter(from: .uppercaseLetters) != nil &&
+            password.rangeOfCharacter(from: .lowercaseLetters) != nil &&
+            password.rangeOfCharacter(from: .decimalDigits) != nil &&
+        hasSpecialCharacter(password)
     }
-    
+
+    private func hasSpecialCharacter(_ password: String) -> Bool {
+        let specialCharacters = CharacterSet(charactersIn: "!@#$%^&*()_+-=[]{}|;':\",./<>?")
+        return password.rangeOfCharacter(from: specialCharacters) != nil
+    }
+
     var isPhoneNumberValid: Bool {
         !phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -37,68 +44,91 @@ class LoginViewModel: ObservableObject {
     // MARK: - Validation Methods
     
     func validateForm() -> String? {
-        if phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        let trimmedPhoneNumber = phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+           
+        print("🔍 Login Validation Debug:")
+        print("   Phone Number: '\(phoneNumber)' (length: \(phoneNumber.count))")
+        print("   Trimmed Phone: '\(trimmedPhoneNumber)' (length: \(trimmedPhoneNumber.count))")
+        print("   Password: '\(password)' (length: \(password.count))")
+        print("   isPhoneNumberValid: \(isPhoneNumberValid)")
+        print("   isPasswordValid: \(isPasswordValid)")
+        print("   isFormValid: \(isFormValid)")
+           
+        if trimmedPhoneNumber.isEmpty {
+            print("❌ Phone number validation failed")
             return "Phone number is required"
         }
-        
+           
         if password.isEmpty {
+            print("❌ Password empty validation failed")
             return "Password is required"
         }
-        
+           
         if password.count < 8 {
+            print("❌ Password length validation failed: \(password.count)")
             return "Password must be at least 8 characters"
         }
-        
+           
         if password.rangeOfCharacter(from: .uppercaseLetters) == nil {
+            print("❌ Password uppercase validation failed")
             return "Password must contain at least one uppercase letter"
         }
-        
+           
         if password.rangeOfCharacter(from: .lowercaseLetters) == nil {
+            print("❌ Password lowercase validation failed")
             return "Password must contain at least one lowercase letter"
         }
-        
+           
         if password.rangeOfCharacter(from: .decimalDigits) == nil {
+            print("❌ Password digit validation failed")
             return "Password must contain at least one number"
         }
-        
+           
+        print("✅ Login validation passed")
         return nil
     }
     
     // MARK: - Actions
     
     func login(authManager: AuthManager) {
-           guard !isLoading else { return }
-           
-           if let validationError = validateForm() {
-               errorMessage = validationError
-               return
-           }
-           
-           isLoading = true
-           errorMessage = nil
-           
-           Task {
-               do {
-                   try await authManager.login(
-                       phoneNumber: phoneNumber,
-                       password: password
-                   )
-                   
-                   await MainActor.run {
-                       isLoading = false
-                       Task {
-                           try? await Task.sleep(nanoseconds: 100_000_000)
-                       }
-                   }
-                   
-               } catch {
-                   await MainActor.run {
-                       isLoading = false
-                       errorMessage = error.localizedDescription
-                   }
-               }
-           }
-       }
+        guard !isLoading else { return }
+        
+        print("🚀 Login attempt started")
+        print("   Phone: '\(phoneNumber)'")
+        print("   Password length: \(password.count)")
+        
+        if let validationError = validateForm() {
+            print("❌ Login validation failed: \(validationError)")
+            errorMessage = validationError
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        Task {
+            do {
+                print("📡 Calling authManager.login...")
+                try await authManager.login(
+                    phoneNumber: phoneNumber,
+                    password: password
+                )
+                
+                print("✅ Login successful")
+                await MainActor.run {
+                    isLoading = false
+                }
+                
+            } catch {
+                print("❌ Login failed: \(error)")
+                await MainActor.run {
+                    isLoading = false
+                    errorMessage = error.localizedDescription
+                }
+            }
+        }
+    }
+
     func resetState() {
         phoneNumber = ""
         password = ""

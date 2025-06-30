@@ -13,7 +13,7 @@ struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State private var navigationPath = NavigationPath()
     @State private var showingImageSelection = false
-    
+    @EnvironmentObject var apiService: APIService
     var body: some View {
         NavigationStack(path: $navigationPath) {
             Group {
@@ -29,6 +29,9 @@ struct ProfileView: View {
                     navigationPath.removeLast()
                 })
             }
+        }
+        .onAppear {
+            viewModel.setAPIService(apiService)
         }
         .confirmationDialog(
             "L10n.Profile.logoutConfirmationTitle",
